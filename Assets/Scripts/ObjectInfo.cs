@@ -2,37 +2,62 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-
-public class ObjectInfo : MonoBehaviour
+namespace RTSGame
 {
-    public bool isSelected = false;
-    public string objectName;
-    public NavMeshAgent agent;
-
-    // Start is called before the first frame update
-    void Start()
+    public class ObjectInfo : MonoBehaviour
     {
-        
-    }
+        public bool isSelected = false;
+        public string objectName;
+        public NavMeshAgent agent;
+        public int heldResource;
+        public ResourceTypes heldResourceType;
 
-    // Update is called once per frame
-    void Update()
-    {
-        if(Input.GetMouseButtonDown(1) && isSelected)
+        public int maxHeldResource;
+        public bool isGathering = false;
+        // Start is called before the first frame update
+        void Start()
         {
-            RightClick();
+            StartCoroutine("GatherTick");
         }
-    }
 
-    public void RightClick()
-    {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        if(Physics.Raycast(ray,out hit, 100))
+        // Update is called once per frame
+        void Update()
         {
-            if(hit.collider.tag=="Ground")
+            if(heldResource>=maxHeldResource)
             {
-                agent.destination = hit.point;
+                //go back to drop-off point
+            }
+        }
+
+        public void OnTriggerEnter(Collider other)
+        {
+            GameObject hitObject = other.gameObject;
+
+            if (hitObject.CompareTag("Resource"))
+            {
+                hitObject.GetComponent<NodeManager>().numberOfGatherers++;
+                heldResourceType = hitObject.GetComponent<NodeManager>().resourceType;
+                isGathering = true;
+
+            }
+        }
+        public void OnTriggerExit(Collider other)
+        {
+            GameObject hitObject = other.gameObject;
+            if (hitObject.CompareTag("Resource"))
+            {
+                hitObject.GetComponent<NodeManager>().numberOfGatherers--;
+                isGathering = false;
+            }
+        }
+
+        public IEnumerator GatherTick()
+        {
+            while(true)
+            {
+                yield return new WaitForSeconds(1);
+               if(isGathering && heldResource<maxHeldResource) heldResource++;
+
             }
         }
     }

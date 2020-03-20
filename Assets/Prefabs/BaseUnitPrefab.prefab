@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 867764731560709573}
   - component: {fileID: -4411742988244287789}
   - component: {fileID: 859842674}
+  - component: {fileID: 4343022997481130953}
   - component: {fileID: 4958155237158487853}
   m_Layer: 0
   m_Name: BaseUnitPrefab
@@ -103,6 +104,25 @@ CapsuleCollider:
   m_Height: 1
   m_Direction: 1
   m_Center: {x: 0, y: 0.31800056, z: -0.014956355}
+--- !u!114 &4343022997481130953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3355122582915056412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2b7e8584b6d54a449b8db48194187cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isSelected: 0
+  objectName: Civilian
+  agent: {fileID: 0}
+  heldResource: 0
+  heldResourceType: 0
+  maxHeldResource: 5
+  isGathering: 0
 --- !u!195 &4958155237158487853
 NavMeshAgent:
   m_ObjectHideFlags: 0

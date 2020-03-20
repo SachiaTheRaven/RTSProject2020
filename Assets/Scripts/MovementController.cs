@@ -2,37 +2,39 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-
-public class MovementController : MonoBehaviour
+namespace RTSGame
 {
-    // Start is called before the first frame update
-
-    NavMeshAgent agent;
-    public GameObject rallyPoint;
-
-    void Start()
+    public class MovementController : MonoBehaviour
     {
-        agent = GetComponent<NavMeshAgent>();
-        agent.SetDestination(rallyPoint.transform.position);
-        
-    }
+        // Start is called before the first frame update
 
-    // Update is called once per frame
-    void Update()
-    {
-        if(agent.destination.x==rallyPoint.transform.position.x && agent.destination.z==rallyPoint.transform.position.z)
+        NavMeshAgent agent;
+        public GameObject rallyPoint;
+
+        void Start()
         {
-            Debug.Log(agent.remainingDistance);
-            if (agent.remainingDistance < 1.0f)
+            agent = GetComponent<NavMeshAgent>();
+            agent.SetDestination(rallyPoint.transform.position);
+
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            if (agent.destination.x == rallyPoint.transform.position.x && agent.destination.z == rallyPoint.transform.position.z)
             {
-                agent.ResetPath();
-                Debug.Log("Path cleared");
+                Debug.Log(agent.remainingDistance);
+                if (agent.remainingDistance < 1.0f)
+                {
+                    agent.ResetPath();
+                    Debug.Log("Path cleared");
+                }
             }
         }
-    }
 
-    public void Move(Vector3 target)
-    {
-        agent.SetDestination(target);
+        public void Move(Vector3 target)
+        {
+            agent.SetDestination(target);
+        }
     }
 }

@@ -1,36 +1,40 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class BaseUnit : MonoBehaviour
+namespace RTSGame
 {
-    // Start is called before the first frame update
-    public int price = 1;
-    public PlayerController player;
-    public bool selected = false;
-    
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
+
+    public class BaseUnit : MonoBehaviour
     {
-       
-        
-    }
-    public void ToggleSelection()
-    {
-        if(selected)
+        // Start is called before the first frame update
+        public int price = 1;
+        public PlayerController player;
+        public bool selected = false;
+
+        void Start()
         {
-            player.selected.Remove(gameObject);
-            selected = false;
+
         }
-        else
+
+        // Update is called once per frame
+        void Update()
         {
-            player.selected.Add(gameObject);
-            selected = true;
+
+
+        }
+        public void ToggleSelection()
+        {
+            if (selected)
+            {
+                player.selected.Remove(gameObject);
+                selected = false;
+            }
+            else
+            {
+                player.selected.Add(gameObject);
+                selected = true;
+            }
         }
     }
 }
