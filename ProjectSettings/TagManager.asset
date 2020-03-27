@@ -9,6 +9,7 @@ TagManager:
   - Ground
   - Selectable
   - Resource
+  - DropPoint
   layers:
   - Default
   - TransparentFX

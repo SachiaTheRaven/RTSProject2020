@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,7 +20,10 @@ namespace RTSGame
         public float harvestTime;
         public float availableResource;
 
-        public int numberOfGatherers;
+        private int numberOfGatherers=0;
+
+        private int excessGatherers = 0;
+        
         void Start()
         {
             StartCoroutine("ResourceTick");
@@ -44,9 +48,20 @@ namespace RTSGame
             {
                 yield return new WaitForSeconds(1);
                 ResourceGather();
+                numberOfGatherers -= excessGatherers;
+                excessGatherers = 0;
             }
         }
 
+        public void ReduceGatherers(int number)
+        {
+            excessGatherers += number;
+        }
+
+        internal void AddGatherers(int number)
+        {
+            numberOfGatherers += number;
+        }
     }
 
 }
