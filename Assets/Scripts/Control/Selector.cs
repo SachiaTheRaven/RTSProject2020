@@ -43,6 +43,7 @@ namespace RTSGame
                     else if (hit.collider.CompareTag("Resource"))
                     {
                         selectedObject.GetComponent<MovementController>().Move(hit.collider.transform.position);
+                        selectedObject.GetComponent<ObjectInfo>().SetTask(UnitTasks.GATHERING);
                         Debug.Log("Harvesting");
                     }
                 }

@@ -5,15 +5,12 @@ using UnityEngine;
 
 namespace RTSGame
 {
-    public enum ResourceTypes
-    {
-        STONE
-
-    };
+    
     public class NodeManager : MonoBehaviour
     {
         // Start is called before the first frame update
-      
+
+       
 
         public ResourceTypes resourceType;
 
