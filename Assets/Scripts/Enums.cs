@@ -14,7 +14,11 @@ namespace RTSGame
     }
     public enum ResourceTypes
     {
-        STONE
+        STONE,
+        IRON,
+        GOLD,
+        FOOD,
+        POPULATION
 
     };
    

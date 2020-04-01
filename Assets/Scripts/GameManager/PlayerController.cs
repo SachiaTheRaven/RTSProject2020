@@ -23,9 +23,9 @@ namespace RTSGame
         // Update is called once per frame
         void Update()
         {
-            //goldText.GetComponent<TextMeshPro>().text = gold.ToString();
-            // Debug.Log(goldText.GetComponent<TextMeshPro>());
-            //stoneText.GetComponent<TextMeshPro>().text = stone.ToString();
+            //goldText.GetComponent<TextMeshProUGUI>().text = gold.ToString();
+            // Debug.Log(goldText.GetComponent<TextMeshProUGUI>());
+            //stoneText.GetComponent<TextMeshProUGUI>().text = stone.ToString();
         }
     }
 }
