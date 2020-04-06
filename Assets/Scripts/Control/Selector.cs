@@ -10,7 +10,7 @@ namespace RTSGame
         // Start is called before the first frame update
         bool movingFlag = false;
         RallyPoint rallyPoint;
-        GameObject selectedObject;
+        public GameObject selectedObject;
         ObjectInfo selectedInfo;
         void Start()
         {
@@ -42,14 +42,13 @@ namespace RTSGame
                     }
                     else if (hit.collider.CompareTag("Resource"))
                     {
-                        selectedObject.GetComponent<MovementController>().Move(hit.collider.transform.position);
-                        selectedObject.GetComponent<ObjectInfo>().SetTask(UnitTasks.GATHERING);
-                        Debug.Log("Harvesting");
+                        BaseUnit bu = selectedObject.GetComponent<BaseUnit>();
+                        if (bu != null)
+                        {
+                            bu.AddTask(new ActionOnObject(selectedObject, hit.transform.gameObject, ActionType.HARVEST));
+                        }
                     }
                 }
-
-
-
             }
         }
 
@@ -65,20 +64,23 @@ namespace RTSGame
                     //selecting destination for the selected units
                     if (selectedObject != null)
                     {
-                        MovementController mc = selectedObject.GetComponent<MovementController>();
-                        if (hit.collider.CompareTag("Ground") && mc != null)
+                        BaseUnit so = selectedObject.GetComponent<BaseUnit>();
+                        if (hit.collider.CompareTag("Ground") && so != null)
                         {
-                            mc.Move(hit.point);
+                            Debug.Log("Adding task to " + selectedObject.name);
+
+                            so.AddTask(new ActionOnPosition(selectedObject, hit.point, ActionType.MOVE));
                         }
                     }
-                    else if (hit.collider.tag == "Selectable")
+                    if (hit.collider.tag == "Selectable")
                     {
+                        if (selectedObject != null) selectedInfo.ToggleSelection();
                         selectedObject = hit.collider.gameObject;
                         selectedInfo = selectedObject.GetComponent<ObjectInfo>();
 
-                        selectedInfo.isSelected = true;
+                        selectedInfo.ToggleSelection();
                     }
-                    else if (movingFlag)
+                    if (movingFlag)
                     {
                         Debug.Log("Moving flag to:" + hit.point);
                         rallyPoint.baseConnected.SetNewRallyPoint(hit.point);
@@ -91,6 +93,7 @@ namespace RTSGame
                         rallyPoint = hit.transform.gameObject.GetComponent<RallyPoint>();
                         if (trainer != null)
                         {
+                            //TODO add task queue to buildings
                             trainer.TrainNew();
 
                         }

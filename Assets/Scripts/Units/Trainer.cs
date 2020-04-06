@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-//TODO rally point
 namespace RTSGame
 {
     public class Trainer : MonoBehaviour
@@ -52,7 +51,7 @@ namespace RTSGame
             newGO.transform.position = new Vector3(newPos.x, 0.5f, newPos.z);
 
             newGO.GetComponent<MovementController>().rallyPoint = rallyPoint;
-            newGO.GetComponent<BaseUnit>().player = this.player;
+            newGO.GetComponent<ObjectInfo>().player = this.player;
             player.units.Add(newGO);
         }
 

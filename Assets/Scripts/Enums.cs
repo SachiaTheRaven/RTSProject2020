@@ -12,6 +12,12 @@ namespace RTSGame
         ATTACKING,
         DELIVERING
     }
+    public enum ActionType
+        {
+        MOVE,
+        HARVEST,
+        ATTACK
+    }
     public enum ResourceTypes
     {
         STONE,

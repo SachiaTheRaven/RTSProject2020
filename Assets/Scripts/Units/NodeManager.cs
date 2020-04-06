@@ -34,7 +34,6 @@ namespace RTSGame
         }
         public void ResourceGather()
         {
-            //TODO: remove gatherer when not gathering
 
             if (numberOfGatherers>0)
                 availableResource-=numberOfGatherers;

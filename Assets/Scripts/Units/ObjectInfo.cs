@@ -4,12 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
+
+//TODO: cancel tasks --> auto-sense finishing criteria?
 namespace RTSGame
 {
     public class ObjectInfo : MonoBehaviour
     {
         public UnitTasks task;
         public ResourceManager resourceManager;
+        public PlayerController player;
+
 
         public bool isSelected = false;
         public string objectName;
@@ -20,11 +24,14 @@ namespace RTSGame
         public bool isGathering = false;
 
         private GameObject gatheringFrom = null;
+        public GameObject selectionMarker;
+
 
         List<GameObject> dropPoints;
         void Start()
         {
             StartCoroutine("GatherTick");
+            task = UnitTasks.IDLE;
             resourceManager = FindObjectOfType<ResourceManager>();
             if (resourceManager == null) throw new Exception("No ResourceManager found!");
         }
@@ -148,9 +155,32 @@ namespace RTSGame
 
         private void DeliverResources()
         {
+            //TODO: move to a separate class (Interface? Separate component?)
             dropPoints = new List<GameObject>(GameObject.FindGameObjectsWithTag("DropPoint"));
             gameObject.GetComponent<MovementController>().Move(GetClosestOf(dropPoints).transform.position);
             task = UnitTasks.DELIVERING;
+        }
+
+
+        public void ToggleSelection()
+        {
+            
+            if (isSelected)
+            {
+                Debug.Log("Togglin false");
+                player.selected.Remove(gameObject);
+                isSelected = false;
+                selectionMarker.SetActive(false);
+            }
+            else
+            {
+                Debug.Log("Togglin true");
+
+                player.selected.Add(gameObject);
+                isSelected = true;
+                selectionMarker.SetActive(true);
+            }
+
         }
     }
 }
