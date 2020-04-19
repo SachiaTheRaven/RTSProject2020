@@ -9,14 +9,16 @@ namespace RTSGame
     {
         // Start is called before the first frame update
         public int price = 1;
-        public Queue<Action> taskList;
+        public List<Action> taskList;
         public Action taskInProgress;
+
+        
 
         
 
         void Start()
         {
-            taskList = new Queue<Action>();
+            taskList = new List<Action>();
         }
 
         // Update is called once per frame
@@ -29,8 +31,8 @@ namespace RTSGame
             }
             else if (GetComponent<ObjectInfo>().task == UnitTasks.IDLE && taskList.Count > 0)
             {
-                Debug.Log("Starting next task");
-                taskInProgress = taskList.Dequeue();
+                taskInProgress = taskList[0];
+                taskList.RemoveAt(0);
                 taskInProgress.Execute();
             }
 
@@ -39,13 +41,13 @@ namespace RTSGame
 
         public void AddTask(Action action)
         {
-            Debug.Log("Task enqued");
-            taskList.Enqueue(action);
+            taskList.Add(action);
+            
+
         }
 
         public void  CancelAction()
         {
-            Debug.Log("Cancelling Action");
             taskInProgress = null;
             GetComponent<ObjectInfo>().task = UnitTasks.IDLE;
         }

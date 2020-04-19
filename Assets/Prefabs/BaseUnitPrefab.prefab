@@ -60,6 +60,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   price: 1
+  taskListPanel: {fileID: 0}
+  taskItem: {fileID: 8147617039658511741, guid: a528cd9bcb848814080b3d72ec87f560,
+    type: 3}
 --- !u!114 &867764731560709573
 MonoBehaviour:
   m_ObjectHideFlags: 0

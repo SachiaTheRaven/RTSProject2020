@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace RTSGame
 {
@@ -12,18 +14,63 @@ namespace RTSGame
         RallyPoint rallyPoint;
         public GameObject selectedObject;
         ObjectInfo selectedInfo;
+        EventSystem eventSystem;
+
+        public GameObject taskQPanel;
+        public GameObject taskPrefab;
         void Start()
         {
+            eventSystem = FindObjectOfType<EventSystem>();
 
         }
 
         // Update is called once per frame
         void Update()
         {
-            GetSelection();
-            GetDeselection();
+
+            if (eventSystem.currentSelectedGameObject!=null && eventSystem.currentSelectedGameObject.layer == 5)
+            {
+                return;
+            }
+            else
+            {
+                GetSelection();
+                GetDeselection();
+            }
+           
         }
 
+        void DisplayActions()
+        {
+            //TODO: ennek nem itt a helye
+            if (selectedObject != null)
+            {
+                BaseUnit bu = selectedObject.GetComponent<BaseUnit>();
+                foreach (var action in bu.taskList)
+                {
+                    AddActionItemToDisplay(action);
+                }
+            }
+
+
+        }
+        void AddActionItemToDisplay(Action action)
+        {
+            GameObject t = Instantiate(taskPrefab);
+            t.transform.SetParent(taskQPanel.transform, false);
+            t.GetComponent<TaskItem>().action = action;
+        }
+        void ClearActionDisplay()
+        {
+            foreach (Transform child in taskQPanel.transform)
+            {
+                if (!child.Equals(transform))
+                {
+                    Destroy(child.gameObject);
+                }
+                transform.DetachChildren();
+            }
+        }
         private void GetDeselection()
         {
             if (Input.GetMouseButtonDown(1))
@@ -32,13 +79,18 @@ namespace RTSGame
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out hit))
                 {
+                   
+                       
+
+
                     if (hit.collider.CompareTag("Ground") && selectedObject != null)
-                    {
+                    { 
                         if (selectedInfo.isSelected) selectedInfo.isSelected = false;
                         selectedObject = null;
                         selectedInfo = null;
                         rallyPoint = null;
                         movingFlag = false;
+                        ClearActionDisplay();
                     }
                     else if (hit.collider.CompareTag("Resource"))
                     {
@@ -67,9 +119,10 @@ namespace RTSGame
                         BaseUnit so = selectedObject.GetComponent<BaseUnit>();
                         if (hit.collider.CompareTag("Ground") && so != null)
                         {
-                            Debug.Log("Adding task to " + selectedObject.name);
+                            Action newAction = new ActionOnPosition(selectedObject, hit.point, ActionType.MOVE);
+                            so.AddTask(newAction);
+                            AddActionItemToDisplay(newAction);
 
-                            so.AddTask(new ActionOnPosition(selectedObject, hit.point, ActionType.MOVE));
                         }
                     }
                     if (hit.collider.tag == "Selectable")
@@ -77,12 +130,13 @@ namespace RTSGame
                         if (selectedObject != null) selectedInfo.ToggleSelection();
                         selectedObject = hit.collider.gameObject;
                         selectedInfo = selectedObject.GetComponent<ObjectInfo>();
+                        ClearActionDisplay();
+                        DisplayActions();
 
                         selectedInfo.ToggleSelection();
                     }
                     if (movingFlag)
                     {
-                        Debug.Log("Moving flag to:" + hit.point);
                         rallyPoint.baseConnected.SetNewRallyPoint(hit.point);
 
                         movingFlag = false;
@@ -99,7 +153,6 @@ namespace RTSGame
                         }
                         else if (hit.transform.gameObject.CompareTag("RallyFlag") && rallyPoint != null)
                         {
-                            Debug.Log("Moving flag!");
                             movingFlag = true;
                         }
                     }

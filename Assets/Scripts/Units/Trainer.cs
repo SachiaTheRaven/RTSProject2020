@@ -11,6 +11,7 @@ namespace RTSGame
         public GameObject unitPrototype;
         public GameObject rallyPoint;
         public GameObject rallyFlag;
+        public Transform taskListPanel;
         GameObject unitParent;
         public PlayerController player;
         public int price;

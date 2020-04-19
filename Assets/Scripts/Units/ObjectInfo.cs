@@ -118,7 +118,6 @@ namespace RTSGame
 
         private void StartGathering(GameObject hitObject)
         {
-            Debug.Log("Start Gathering");
             gatheringFrom = hitObject;
             hitObject.GetComponent<NodeManager>().AddGatherers(1);
             heldResourceType = hitObject.GetComponent<NodeManager>().resourceType;
@@ -127,7 +126,6 @@ namespace RTSGame
         }
         private void StopGathering()
         {
-            Debug.Log("Stop gathering");
             if (gatheringFrom != null)
             {
                 gatheringFrom.GetComponent<NodeManager>().ReduceGatherers(1);
@@ -167,15 +165,12 @@ namespace RTSGame
             
             if (isSelected)
             {
-                Debug.Log("Togglin false");
                 player.selected.Remove(gameObject);
                 isSelected = false;
                 selectionMarker.SetActive(false);
             }
             else
             {
-                Debug.Log("Togglin true");
-
                 player.selected.Add(gameObject);
                 isSelected = true;
                 selectionMarker.SetActive(true);

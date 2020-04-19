@@ -570,6 +570,7 @@ MonoBehaviour:
     type: 3}
   rallyPoint: {fileID: 1612759481}
   rallyFlag: {fileID: 1865121541}
+  taskListPanel: {fileID: 0}
   player: {fileID: 0}
   price: 0
   cdText: {fileID: 900219002}

@@ -25,9 +25,6 @@ namespace RTSGame
         {
             if (ReachedDestination())
             {
-                Debug.Log("Distance: " + agent.remainingDistance);
-
-                Debug.Log("Reseting destination.");
                 agent.ResetPath();
                 oinfo.SetTask(UnitTasks.IDLE);
 
@@ -38,10 +35,8 @@ namespace RTSGame
 
         public void Move(Vector3 target)
         {
-            Debug.Log("moving " + gameObject.name + " to " + target);
             GetComponent<ObjectInfo>().SetTask(UnitTasks.MOVING);
             agent.SetDestination(target);
-            Debug.Log("Current pos: " + transform.position + " dest: " + agent.destination);
         }
 
         public bool ReachedDestination()
