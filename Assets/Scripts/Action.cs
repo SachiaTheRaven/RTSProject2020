@@ -43,6 +43,7 @@ namespace RTSGame
         {
             if (!inProgress)
             {
+                //TODO itt is taskmgr csere
                 initiator.GetComponent<BaseUnit>().taskList.Remove(this);
             }
         }
@@ -51,17 +52,27 @@ namespace RTSGame
     public class ActionOnObject : Action
     {
         //TODO: set IsFinished
+        bool hasRoundLimit = false;
+        int maxRounds;
+
         public GameObject targetObject;
-        public ActionOnObject(GameObject init, GameObject targ, ActionType at)
+        public ActionOnObject(GameObject init, GameObject targ, ActionType at,int roundLimit=0)
         {
             initiator = init;
             targetObject = targ;
             type = at;
+            maxRounds = roundLimit;
+            hasRoundLimit = maxRounds > 0;
+            IsFinished = new IsFinishedDelegate(() => { return hasRoundLimit &&< roundLimit; });
+
         }
 
         public override void Cancel()
         {
-            throw new System.NotImplementedException();
+            if (!inProgress)
+            {
+                initiator.GetComponent<BaseUnit>().taskList.Remove(this);
+            }
         }
 
         public override void Execute()
@@ -71,7 +82,7 @@ namespace RTSGame
                 case ActionType.HARVEST:
                     {
                         initiator.GetComponent<MovementController>().Move(targetObject.transform.position);
-                        initiator.GetComponent<ObjectInfo>().SetTask(UnitTasks.GATHERING);
+                        initiator.GetComponent<ObjectInfo>().SetTask(UnitTasks.GATHERING,maxRounds);
 
                     }
 

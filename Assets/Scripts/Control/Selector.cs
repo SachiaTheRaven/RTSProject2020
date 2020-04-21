@@ -28,16 +28,16 @@ namespace RTSGame
         void Update()
         {
 
-            if (eventSystem.currentSelectedGameObject!=null && eventSystem.currentSelectedGameObject.layer == 5)
+            if (eventSystem.currentSelectedGameObject != null && eventSystem.currentSelectedGameObject.layer == 5)
             {
                 return;
             }
             else
             {
-                GetSelection();
-                GetDeselection();
+                GetLeftButtonDown();
+                GetRightButtonDown();
             }
-           
+
         }
 
         void DisplayActions()
@@ -71,7 +71,7 @@ namespace RTSGame
                 transform.DetachChildren();
             }
         }
-        private void GetDeselection()
+        private void GetRightButtonDown()
         {
             if (Input.GetMouseButtonDown(1))
             {
@@ -79,22 +79,18 @@ namespace RTSGame
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out hit))
                 {
-                   
-                       
-
-
-                    if (hit.collider.CompareTag("Ground") && selectedObject != null)
-                    { 
-                        if (selectedInfo.isSelected) selectedInfo.isSelected = false;
-                        selectedObject = null;
-                        selectedInfo = null;
-                        rallyPoint = null;
-                        movingFlag = false;
-                        ClearActionDisplay();
+                    //TODO separate into TaskManager component, don't call in every update
+                    BaseUnit bu = selectedObject.GetComponent<BaseUnit>();
+                    //right click on ground: select where to move
+                    if (hit.collider.CompareTag("Ground") && bu != null)
+                    {
+                        Action newAction = new ActionOnPosition(selectedObject, hit.point, ActionType.MOVE);
+                        bu.AddTask(newAction);
+                        AddActionItemToDisplay(newAction);
                     }
                     else if (hit.collider.CompareTag("Resource"))
                     {
-                        BaseUnit bu = selectedObject.GetComponent<BaseUnit>();
+
                         if (bu != null)
                         {
                             bu.AddTask(new ActionOnObject(selectedObject, hit.transform.gameObject, ActionType.HARVEST));
@@ -104,45 +100,32 @@ namespace RTSGame
             }
         }
 
-        void GetSelection()
+        void GetLeftButtonDown()
         {
             if (Input.GetMouseButtonDown(0))
             {
                 RaycastHit hit;
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
                 if (Physics.Raycast(ray, out hit))
                 {
-                    //selecting destination for the selected units
-                    if (selectedObject != null)
+                    if (hit.collider.CompareTag("Ground"))
                     {
-                        BaseUnit so = selectedObject.GetComponent<BaseUnit>();
-                        if (hit.collider.CompareTag("Ground") && so != null)
+                        if (movingFlag)
                         {
-                            Action newAction = new ActionOnPosition(selectedObject, hit.point, ActionType.MOVE);
-                            so.AddTask(newAction);
-                            AddActionItemToDisplay(newAction);
-
+                            MoveFlag(hit.point);
+                        }
+                        else if (selectedObject != null)
+                        {
+                            Deselect();
                         }
                     }
-                    if (hit.collider.tag == "Selectable")
+                    else if (hit.collider.CompareTag("Selectable"))
                     {
-                        if (selectedObject != null) selectedInfo.ToggleSelection();
-                        selectedObject = hit.collider.gameObject;
-                        selectedInfo = selectedObject.GetComponent<ObjectInfo>();
-                        ClearActionDisplay();
-                        DisplayActions();
-
-                        selectedInfo.ToggleSelection();
-                    }
-                    if (movingFlag)
-                    {
-                        rallyPoint.baseConnected.SetNewRallyPoint(hit.point);
-
-                        movingFlag = false;
+                        Select(hit.collider.gameObject);
                     }
                     else
                     {
+                        //TODO make a separate branch for these
                         Trainer trainer = hit.transform.gameObject.GetComponent<Trainer>();
                         rallyPoint = hit.transform.gameObject.GetComponent<RallyPoint>();
                         if (trainer != null)
@@ -156,10 +139,35 @@ namespace RTSGame
                             movingFlag = true;
                         }
                     }
-
                 }
             }
+        }
 
+        void Deselect()
+        {
+            if (selectedObject != null)
+            {
+                if (selectedInfo.isSelected) selectedInfo.isSelected = false;
+                selectedObject = null;
+                selectedInfo = null;
+                rallyPoint = null;
+                movingFlag = false;
+                ClearActionDisplay();
+            }
+        }
+        void Select(GameObject go)
+        {
+            if (selectedObject != null) selectedInfo.ToggleSelection();
+            selectedObject = go;
+            selectedInfo = selectedObject.GetComponent<ObjectInfo>();
+            ClearActionDisplay();
+            DisplayActions();
+            selectedInfo.ToggleSelection();
+        }
+        void MoveFlag(Vector3 dest)
+        {
+            rallyPoint.baseConnected.SetNewRallyPoint(dest);
+            movingFlag = false;
         }
     }
 

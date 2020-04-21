@@ -12,6 +12,8 @@ namespace RTSGame
         public List<Action> taskList;
         public Action taskInProgress;
 
+        public int maxNumberOfTasks = 10;
+
         
 
         
@@ -19,6 +21,7 @@ namespace RTSGame
         void Start()
         {
             taskList = new List<Action>();
+            
         }
 
         // Update is called once per frame
@@ -41,8 +44,14 @@ namespace RTSGame
 
         public void AddTask(Action action)
         {
-            taskList.Add(action);
-            
+            if(taskList.Count<maxNumberOfTasks)
+            {
+                taskList.Add(action);
+            }
+            else
+            {
+                //TODO valami effektet megjeleníteni
+            }
 
         }
 

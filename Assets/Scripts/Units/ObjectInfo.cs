@@ -26,8 +26,10 @@ namespace RTSGame
         private GameObject gatheringFrom = null;
         public GameObject selectionMarker;
 
-
         List<GameObject> dropPoints;
+
+        int taskRoundLimit;
+        int taskRoundsFinished;
         void Start()
         {
             StartCoroutine("GatherTick");
@@ -43,12 +45,10 @@ namespace RTSGame
             {
                 //go back to drop-off point
                 StopGathering();
-
-
             }
         }
 
-
+        //TODO move to sep. component
         public void OnTriggerEnter(Collider other)
         {
             GameObject hitObject = other.gameObject;
@@ -66,14 +66,17 @@ namespace RTSGame
                     {
                         if (task == UnitTasks.DELIVERING)
                         {
-                            if (resourceManager.stone + heldResource > resourceManager.maxStone)
+                            if (resourceManager.stone + heldResource > resourceManager.maxStone || 
+                                (taskRoundLimit!=0 && taskRoundsFinished==taskRoundLimit))
                             {
-                                SetTask(UnitTasks.IDLE);
+                                MovementController mc = GetComponent<MovementController>();
+                                mc.Move(mc.rallyPoint.transform.position);
                             }
                             else
                             {
                                 resourceManager.stone += heldResource;
                                 heldResource = 0;
+                                if(taskRoundLimit!=0) taskRoundsFinished++;
                                 GetComponent<MovementController>().Move(gatheringFrom.transform.position);
                                 SetTask(UnitTasks.GATHERING);
 
@@ -139,16 +142,19 @@ namespace RTSGame
                 }
                 else
                 {
-                    SetTask(UnitTasks.IDLE);
+                    MovementController mc = GetComponent<MovementController>();
+                    mc.Move(mc.rallyPoint.transform.position);
                 }
             }
             isGathering = false;
-            //gatheringFrom = null;
         }
 
-        public void SetTask(UnitTasks newTask)
+        public void SetTask(UnitTasks newTask,int roundLimit=0)
         {
+            //TODO to tskmgr
             task = newTask;
+            taskRoundLimit = roundLimit;
+            taskRoundsFinished = 0;
         }
 
         private void DeliverResources()
