@@ -29,8 +29,6 @@ namespace RTSGame
         }
         public void OnClick()
         {
-            Debug.Log("CLICK");
-
             action.Cancel();
             Destroy(this.gameObject);
         }

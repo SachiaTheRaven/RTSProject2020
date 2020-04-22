@@ -171,13 +171,12 @@ namespace RTSGame
             
             if (isSelected)
             {
-                player.selected.Remove(gameObject);
+                //TODO maybe store with player somehow
                 isSelected = false;
                 selectionMarker.SetActive(false);
             }
             else
             {
-                player.selected.Add(gameObject);
                 isSelected = true;
                 selectionMarker.SetActive(true);
             }

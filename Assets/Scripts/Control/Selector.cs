@@ -10,14 +10,19 @@ namespace RTSGame
     public class Selector : MonoBehaviour
     {
         // Start is called before the first frame update
+
+        public TaskQueuePanelControl taskQueuePanelControl;
+        public GameObject selectedObject;
+
+        TaskManager taskManagerSelected = null;
+
         bool movingFlag = false;
         RallyPoint rallyPoint;
-        public GameObject selectedObject;
         ObjectInfo selectedInfo;
         EventSystem eventSystem;
 
-        public GameObject taskQPanel;
-        public GameObject taskPrefab;
+
+
         void Start()
         {
             eventSystem = FindObjectOfType<EventSystem>();
@@ -40,37 +45,7 @@ namespace RTSGame
 
         }
 
-        void DisplayActions()
-        {
-            //TODO: ennek nem itt a helye
-            if (selectedObject != null)
-            {
-                BaseUnit bu = selectedObject.GetComponent<BaseUnit>();
-                foreach (var action in bu.taskList)
-                {
-                    AddActionItemToDisplay(action);
-                }
-            }
 
-
-        }
-        void AddActionItemToDisplay(Action action)
-        {
-            GameObject t = Instantiate(taskPrefab);
-            t.transform.SetParent(taskQPanel.transform, false);
-            t.GetComponent<TaskItem>().action = action;
-        }
-        void ClearActionDisplay()
-        {
-            foreach (Transform child in taskQPanel.transform)
-            {
-                if (!child.Equals(transform))
-                {
-                    Destroy(child.gameObject);
-                }
-                transform.DetachChildren();
-            }
-        }
         private void GetRightButtonDown()
         {
             if (Input.GetMouseButtonDown(1))
@@ -79,21 +54,18 @@ namespace RTSGame
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out hit))
                 {
-                    //TODO separate into TaskManager component, don't call in every update
-                    BaseUnit bu = selectedObject.GetComponent<BaseUnit>();
-                    //right click on ground: select where to move
-                    if (hit.collider.CompareTag("Ground") && bu != null)
+                    if (taskManagerSelected != null)
                     {
-                        Action newAction = new ActionOnPosition(selectedObject, hit.point, ActionType.MOVE);
-                        bu.AddTask(newAction);
-                        AddActionItemToDisplay(newAction);
-                    }
-                    else if (hit.collider.CompareTag("Resource"))
-                    {
-
-                        if (bu != null)
+                        //right click on ground: select where to move
+                        if (hit.collider.CompareTag("Ground"))
                         {
-                            bu.AddTask(new ActionOnObject(selectedObject, hit.transform.gameObject, ActionType.HARVEST));
+                            Action newAction = new ActionOnPosition(selectedObject, hit.point, ActionType.MOVE);
+                            PutOutNewAction(newAction);                           
+                        }
+                        else if (hit.collider.CompareTag("Resource"))
+                        {
+                            Action newAction=new ActionOnObject(selectedObject, hit.transform.gameObject, ActionType.HARVEST);
+                            PutOutNewAction(newAction);
                         }
                     }
                 }
@@ -152,22 +124,33 @@ namespace RTSGame
                 selectedInfo = null;
                 rallyPoint = null;
                 movingFlag = false;
-                ClearActionDisplay();
+                taskManagerSelected = null;
+                taskQueuePanelControl.ClearActionDisplay();
             }
         }
         void Select(GameObject go)
         {
             if (selectedObject != null) selectedInfo.ToggleSelection();
+
             selectedObject = go;
             selectedInfo = selectedObject.GetComponent<ObjectInfo>();
-            ClearActionDisplay();
-            DisplayActions();
+            taskManagerSelected = selectedObject.GetComponent<TaskManager>();
+
+            taskQueuePanelControl.ClearActionDisplay();
+            taskQueuePanelControl.DisplayActions(taskManagerSelected);
+
             selectedInfo.ToggleSelection();
         }
         void MoveFlag(Vector3 dest)
         {
             rallyPoint.baseConnected.SetNewRallyPoint(dest);
             movingFlag = false;
+        }
+
+        void PutOutNewAction(Action newAction)
+        {
+            taskManagerSelected.AddTask(newAction);
+            taskQueuePanelControl.AddActionItemToDisplay(newAction);
         }
     }
 

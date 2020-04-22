@@ -66,9 +66,9 @@ namespace RTSGame
         {
             if (isDone)
             {
-                if (player.gold > unitPrototype.GetComponent<BaseUnit>().price)
+                if (player.resourceManager.gold > unitPrototype.GetComponent<BaseUnit>().price)
                 {
-                    player.gold -= unitPrototype.GetComponent<BaseUnit>().price;
+                    player.resourceManager.gold -= unitPrototype.GetComponent<BaseUnit>().price;
                     StartCoroutine("CountdownCoroutine", 3);
                 }
                 else Debug.Log("Not enough money");

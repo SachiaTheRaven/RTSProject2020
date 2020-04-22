@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 859842674}
   - component: {fileID: 4343022997481130953}
   - component: {fileID: 4958155237158487853}
+  - component: {fileID: 7079290007982176401}
   m_Layer: 0
   m_Name: BaseUnitPrefab
   m_TagString: Selectable
@@ -60,9 +61,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   price: 1
-  taskListPanel: {fileID: 0}
-  taskItem: {fileID: 8147617039658511741, guid: a528cd9bcb848814080b3d72ec87f560,
-    type: 3}
 --- !u!114 &867764731560709573
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -150,6 +148,19 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &7079290007982176401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3355122582915056412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 619ad5ab88cb8b94193a2a5eb560c9fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxNumberOfTasks: 10
 --- !u!1 &6685037718374695157
 GameObject:
   m_ObjectHideFlags: 0

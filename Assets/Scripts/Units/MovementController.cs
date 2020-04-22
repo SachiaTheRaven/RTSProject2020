@@ -17,20 +17,13 @@ namespace RTSGame
         {
             agent = GetComponent<NavMeshAgent>();
             agent.SetDestination(rallyPoint.transform.position);
+            agent.stoppingDistance = 0.5f;
             oinfo = GetComponent<ObjectInfo>();
         }
 
         // Update is called once per frame
         void Update()
         {
-            if (ReachedDestination())
-            {
-                agent.ResetPath();
-                oinfo.SetTask(UnitTasks.IDLE);
-
-            }
-
-
         }
 
         public void Move(Vector3 target)
@@ -39,9 +32,13 @@ namespace RTSGame
             agent.SetDestination(target);
         }
 
-        public bool ReachedDestination()
+        public bool ReachedDestination(Vector3 pos)
         {
-            return !agent.pathPending && agent.remainingDistance < 0.005f && oinfo.task == UnitTasks.MOVING;
+           // Debug.Log(agent.destination + "-" + pos + "-" + transform.position);
+            return (agent.destination.x == pos.x && agent.destination.z == pos.z) &&
+                !agent.pathPending &&
+                agent.remainingDistance <= agent.stoppingDistance &&
+                (!agent.hasPath || agent.velocity.sqrMagnitude == 0f);
         }
     }
 }
