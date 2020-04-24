@@ -51,8 +51,9 @@ namespace RTSGame
     public class ActionOnObject : Action
     {
         //TODO: set IsFinished
-        bool hasRoundLimit = false;
-        int maxRounds;
+        public bool HasRoundLimit { get { return maxRounds != 0; } }
+        public int maxRounds { get; set; }
+        public int roundsFinished { get; set; }
 
         public GameObject targetObject;
         public ActionOnObject(GameObject init, GameObject targ, ActionType at,int roundLimit=0)
@@ -61,9 +62,8 @@ namespace RTSGame
             targetObject = targ;
             type = at;
             maxRounds = roundLimit;
-            hasRoundLimit = maxRounds > 0;
-            //TODO!!
-            IsFinished = new IsFinishedDelegate(() => { return hasRoundLimit/* && and stuff*/ ; });
+            roundsFinished = 0;
+            IsFinished = new IsFinishedDelegate(() => { return HasRoundLimit && roundLimit>roundsFinished ;});
 
         }
 
@@ -76,7 +76,7 @@ namespace RTSGame
                 case ActionType.HARVEST:
                     {
                         initiator.GetComponent<MovementController>().Move(targetObject.transform.position);
-                        initiator.GetComponent<ObjectInfo>().SetTask(UnitTasks.GATHERING,maxRounds);
+                        initiator.GetComponent<ObjectInfo>().Status=UnitStatus.GATHERING;
 
                     }
 

@@ -7,11 +7,7 @@ namespace RTSGame
 {
     
     public class NodeManager : MonoBehaviour
-    {
-        // Start is called before the first frame update
-
-       
-
+    {    
         public ResourceTypes resourceType;
 
         public float harvestTime;
@@ -24,17 +20,14 @@ namespace RTSGame
         void Start()
         {
             StartCoroutine("ResourceTick");
-
         }
-
-        // Update is called once per frame
         void Update()
         {
             if (availableResource <= 0) Destroy(gameObject);
+            //TODO play a destroying thingy, like a particle effect or something
         }
         public void ResourceGather()
         {
-
             if (numberOfGatherers>0)
                 availableResource-=numberOfGatherers;
         }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace RTSGame
 {
-    public enum UnitTasks
+    public enum UnitStatus
     {
         GATHERING,
         MOVING,

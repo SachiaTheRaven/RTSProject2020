@@ -10,9 +10,12 @@ namespace RTSGame
         public Action taskInProgress;
         public int maxNumberOfTasks = 10;
 
+        ObjectInfo objectInfo;
+
         void Start()
         {
             taskList = new List<Action>();
+            objectInfo = GetComponent<ObjectInfo>();
 
         }
 
@@ -28,7 +31,7 @@ namespace RTSGame
 
                 }
             }
-            else if (GetComponent<ObjectInfo>().task == UnitTasks.IDLE && taskList.Count > 0)
+            else if (objectInfo.Status == UnitStatus.IDLE && taskList.Count > 0)
             {
                 Debug.Log("starting task");
                 taskInProgress = taskList[0];
@@ -51,7 +54,7 @@ namespace RTSGame
         public void CancelAction()
         {
             taskInProgress = null;
-            GetComponent<ObjectInfo>().task = UnitTasks.IDLE;
+            objectInfo.Status = UnitStatus.IDLE;
         }
 
         public void RemoveAction( Action toBeRemoved)

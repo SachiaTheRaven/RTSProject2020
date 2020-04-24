@@ -33,6 +33,8 @@ namespace RTSGame
             newTaskItem.transform.SetParent(taskQPanel.transform, false);
             newTaskItem.GetComponent<TaskItem>().action = action;
         }
+        
+       
         public void ClearActionDisplay()
         {
             foreach (Transform child in taskQPanel.transform)

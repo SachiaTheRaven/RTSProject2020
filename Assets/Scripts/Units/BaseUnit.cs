@@ -7,28 +7,19 @@ namespace RTSGame
 
     public class BaseUnit : MonoBehaviour
     {
-        //TODO: eventually erre nem lesz szükség
-        // Start is called before the first frame update
-        public int price = 1;    
-
-        
-
-        
-
+        //TODO: eventually erre nem lesz szükség, move to objectinfo
+        public int price = 1;        
         void Start()
         {
             
         }
 
-        // Update is called once per frame
         void Update()
         {
             
 
 
-        }
-
-       
+        }    
 
        
     }

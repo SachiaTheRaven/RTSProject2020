@@ -28,7 +28,7 @@ namespace RTSGame
 
         public void Move(Vector3 target)
         {
-            GetComponent<ObjectInfo>().SetTask(UnitTasks.MOVING);
+            GetComponent<ObjectInfo>().Status=UnitStatus.MOVING;
             agent.SetDestination(target);
         }
 

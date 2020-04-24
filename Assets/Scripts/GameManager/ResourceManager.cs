@@ -6,16 +6,16 @@ namespace RTSGame
 {
     public class ResourceManager : MonoBehaviour
     {
-        public float stone;
-        public float maxStone;
-        public float iron;
-        public float maxIron;
-        public float food;
-        public float maxFood;
-        public float gold;
-        public float maxGold;
-        public float population;
-        public float maxPopulation;
+        public int stone;
+        public int maxStone;
+        public int iron;
+        public int maxIron;
+        public int food;
+        public int maxFood;
+        public int gold;
+        public int maxGold;
+        public int population;
+        public int maxPopulation;
 
         public TextMeshProUGUI stoneDisplay;
         public TextMeshProUGUI ironDisplay;
