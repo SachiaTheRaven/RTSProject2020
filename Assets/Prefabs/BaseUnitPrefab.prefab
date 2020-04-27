@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5488200247230687350}
   - component: {fileID: 184126144472490323}
   - component: {fileID: 867764731560709573}
+  - component: {fileID: 1432170992046002499}
   - component: {fileID: -4411742988244287789}
   - component: {fileID: 859842674}
   - component: {fileID: 4343022997481130953}
@@ -74,6 +75,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rallyPoint: {fileID: 0}
+--- !u!114 &1432170992046002499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3355122582915056412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bed84deec7547c740befd5d11f1a0635, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resourceManager: {fileID: 0}
+  heldResource: 0
+  heldResourceType: 0
+  maxHeldResource: 5
+  isGathering: 0
 --- !u!54 &-4411742988244287789
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -116,15 +134,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2b7e8584b6d54a449b8db48194187cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  task: 0
-  resourceManager: {fileID: 0}
   player: {fileID: 0}
   isSelected: 0
   objectName: Civilian
-  heldResource: 0
-  heldResourceType: 0
-  maxHeldResource: 5
-  isGathering: 0
   selectionMarker: {fileID: 6685037718374695157}
 --- !u!195 &4958155237158487853
 NavMeshAgent:

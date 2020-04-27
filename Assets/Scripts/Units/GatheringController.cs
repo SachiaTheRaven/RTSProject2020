@@ -47,7 +47,7 @@ namespace RTSGame
         // Update is called once per frame
         void Update()
         {
-            if ((heldResource >= maxHeldResource || gatheringFrom == null) && isGathering)
+            if ((heldResource == maxHeldResource || gatheringFrom == null) && isGathering)
             {
                 //go back to drop-off point
                 StopGathering();
@@ -60,24 +60,15 @@ namespace RTSGame
             isGathering = true;
 
             NodeManager nodeManager = resourceGameObject.GetComponent<NodeManager>();
-            nodeManager.AddGatherers(1);
             heldResourceType = nodeManager.resourceType;
         }
 
         private void StopGathering()
         {
+            Debug.Log("stop gathering");            
             if (heldResource != 0)
             {
                 DeliverResources();
-            }
-            if (gatheringFrom != null)
-            {
-                gatheringFrom.GetComponent<NodeManager>().ReduceGatherers(1);
-            }
-            else
-            {
-                //TODO return to rally point function
-                movementController.Move(movementController.rallyPoint.transform.position);
             }
             isGathering = false;
         }
@@ -105,7 +96,7 @@ namespace RTSGame
             {
                 case "Resource":
                     {
-                        if (objectInfo.Status == UnitStatus.GATHERING)
+                        if (objectInfo.Status == UnitStatus.GATHERING && !isGathering)
                         {
                             StartGathering(hitObject);
                         }
@@ -131,8 +122,6 @@ namespace RTSGame
                     }
                     break;
             }
-
-
         }
 
 
@@ -149,9 +138,13 @@ namespace RTSGame
         {
             while (true)
             {
+                Debug.Log("tick");
                 yield return new WaitForSeconds(1);
-                if (isGathering && heldResource < maxHeldResource) heldResource++;
-
+                if (isGathering && heldResource < maxHeldResource)
+                {
+                    gatheringFrom.GetComponent<NodeManager>().Gather(1);
+                    heldResource++;
+                }            
             }
         }
 
