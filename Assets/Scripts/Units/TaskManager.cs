@@ -27,19 +27,18 @@ namespace RTSGame
                 if (taskInProgress.IsFinished())
                 {
                     CancelAction();
-                    Debug.Log("task finished");
 
                 }
             }
-            else if (objectInfo.Status == UnitStatus.IDLE && taskList.Count > 0)
+            else if (objectInfo.status == UnitStatus.IDLE && taskList.Count > 0)
             {
-                Debug.Log("starting task");
+
                 taskInProgress = taskList[0];
                 taskList.RemoveAt(0);
                 taskInProgress.Execute();
             }
         }
-        public void AddTask(Action action)
+        private void AddTask(Action action)
         {
             if (taskList.Count < maxNumberOfTasks)
             {
@@ -51,10 +50,26 @@ namespace RTSGame
             }
 
         }
+
+        //TODO ez valószínűleg felesleges duplicate
+        
+        public void CreateTask(Vector3 pos, ActionType type)
+        {
+            Action action = new ActionOnPosition(gameObject, pos, type);
+            AddTask(action);
+            FindObjectOfType<TaskQueuePanelControl>().AddActionItemToDisplay(action);
+
+        }
+        public void CreateTask(GameObject target, ActionType type, int roundLimit)
+        {
+            Action action = new ActionOnObject(gameObject, target,type,roundLimit);
+            AddTask(action);
+            FindObjectOfType<TaskQueuePanelControl>().AddActionItemToDisplay(action);
+        }
         public void CancelAction()
         {
             taskInProgress = null;
-            objectInfo.Status = UnitStatus.IDLE;
+            objectInfo.status = UnitStatus.IDLE;
         }
 
         public void RemoveAction( Action toBeRemoved)

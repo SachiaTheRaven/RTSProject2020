@@ -7,7 +7,6 @@ namespace RTSGame
 {
     public class Trainer : MonoBehaviour
     {
-        // Start is called before the first frame update
         public GameObject unitPrototype;
         public GameObject rallyPoint;
         public GameObject rallyFlag;
@@ -22,13 +21,6 @@ namespace RTSGame
         {
             unitParent = new GameObject("UnitParent");
             cdText.enabled = false;
-            //Instantiate(unitParent);
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
         }
 
         IEnumerator CountdownCoroutine(int cooldown)
@@ -66,9 +58,11 @@ namespace RTSGame
         {
             if (isDone)
             {
-                if (player.resourceManager.gold > unitPrototype.GetComponent<BaseUnit>().price)
+                ObjectInfo objectInfo = unitPrototype.GetComponent<ObjectInfo>();
+                if (player.resourceManager.GetResourceAmount(ResourceTypes.GOLD) > objectInfo.price)
                 {
-                    player.resourceManager.gold -= unitPrototype.GetComponent<BaseUnit>().price;
+                    player.resourceManager.AddResource(ResourceTypes.GOLD,-objectInfo.price);
+                    player.resourceManager.AddResource(ResourceTypes.POPULATION,1);
                     StartCoroutine("CountdownCoroutine", 3);
                 }
                 else Debug.Log("Not enough money");

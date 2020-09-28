@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 6650081674445240020}
   - component: {fileID: 5488200247230687350}
-  - component: {fileID: 184126144472490323}
   - component: {fileID: 867764731560709573}
   - component: {fileID: 1432170992046002499}
+  - component: {fileID: 8481939163077281954}
   - component: {fileID: -4411742988244287789}
   - component: {fileID: 859842674}
   - component: {fileID: 4343022997481130953}
@@ -49,19 +49,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3355122582915056412}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &184126144472490323
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3355122582915056412}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2aa8a9ab92979994ea412b8c3db1a51c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  price: 1
 --- !u!114 &867764731560709573
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -88,10 +75,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resourceManager: {fileID: 0}
-  heldResource: 0
-  heldResourceType: 0
-  maxHeldResource: 5
+  maxHeldResourcePerBlock: 5
   isGathering: 0
+--- !u!114 &8481939163077281954
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3355122582915056412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a96a9a93922cff64aa04738c0f074ab7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHP: 100
+  hp: 100
 --- !u!54 &-4411742988244287789
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -134,6 +133,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2b7e8584b6d54a449b8db48194187cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  status: 0
   player: {fileID: 0}
   isSelected: 0
   objectName: Civilian

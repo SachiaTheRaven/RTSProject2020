@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -18,12 +20,13 @@ namespace RTSGame
         //references to components of other go's
         public ResourceManager resourceManager;
 
-        public int heldResource;
-        public ResourceTypes heldResourceType;
-        public int maxHeldResource;
+        public Dictionary<ResourceTypes, ResourceBlock> heldResources = new Dictionary<ResourceTypes, ResourceBlock>();
+        public int maxHeldResourcePerBlock = 5;
         public bool isGathering = false;
         private GameObject gatheringFrom = null;
+        private NodeManager nodeManager = null;
         List<GameObject> dropPoints;
+
 
 
 
@@ -47,26 +50,42 @@ namespace RTSGame
         // Update is called once per frame
         void Update()
         {
-            if ((heldResource == maxHeldResource || gatheringFrom == null) && isGathering)
+            if (nodeManager != null && heldResources.ContainsKey(nodeManager.resourceType))
             {
-                //go back to drop-off point
-                StopGathering();
+                ResourceBlock blockToUpdate = heldResources[nodeManager.resourceType];
+                if ((blockToUpdate.amount == blockToUpdate.maxAmount || gatheringFrom == null) && isGathering)
+                {
+                    //go back to drop-off point
+                    StopGathering();
+                }
             }
+
         }
 
         private void StartGathering(GameObject resourceGameObject)
         {
             gatheringFrom = resourceGameObject;
+            nodeManager = resourceGameObject.GetComponent<NodeManager>();
             isGathering = true;
+            if (!heldResources.ContainsKey(nodeManager.resourceType) ||heldResources[nodeManager.resourceType].amount==0)
+            {
+                ResourceBlock newBlock = new ResourceBlock();
+                newBlock.amount = 0;
+                newBlock.maxAmount = maxHeldResourcePerBlock;
+                newBlock.type = nodeManager.resourceType;
+                heldResources[nodeManager.resourceType] = newBlock;
 
-            NodeManager nodeManager = resourceGameObject.GetComponent<NodeManager>();
-            heldResourceType = nodeManager.resourceType;
+                if(objectInfo.isSelected)
+                    FindObjectOfType<UnitUIManager>().InsertInventoryItem(this, nodeManager.resourceType,GetComponent<ObjectInfo>());
+
+            }
+
         }
 
         private void StopGathering()
         {
-            Debug.Log("stop gathering");            
-            if (heldResource != 0)
+
+            if (heldResources[nodeManager.resourceType].amount != 0)
             {
                 DeliverResources();
             }
@@ -78,7 +97,7 @@ namespace RTSGame
             //TODO is it really necessary to get this list every time we deliver?
             dropPoints = new List<GameObject>(GameObject.FindGameObjectsWithTag("DropPoint"));
             movementController.Move(GetClosestOf(dropPoints).transform.position);
-            objectInfo.Status = UnitStatus.DELIVERING;
+            objectInfo.status = UnitStatus.DELIVERING;
         }
 
         //TODO this is pretty generic, are you sure this belongs here?
@@ -96,7 +115,7 @@ namespace RTSGame
             {
                 case "Resource":
                     {
-                        if (objectInfo.Status == UnitStatus.GATHERING && !isGathering)
+                        if (objectInfo.status == UnitStatus.GATHERING && !isGathering)
                         {
                             StartGathering(hitObject);
                         }
@@ -104,13 +123,13 @@ namespace RTSGame
                     break;
                 case "DropPoint":
                     {
-                        if (objectInfo.Status == UnitStatus.DELIVERING)
+                        if (objectInfo.status == UnitStatus.DELIVERING)
                         {
                             UnloadResources();
-                            if (!taskManager.taskInProgress.IsFinished())
+                            if(taskManager.taskInProgress!=null &&!taskManager.taskInProgress.IsFinished())
                             {
                                 movementController.Move(gatheringFrom.transform.position);
-                                objectInfo.Status = UnitStatus.GATHERING;
+                                objectInfo.status = UnitStatus.GATHERING;
                             }
                             else
                             {
@@ -138,33 +157,36 @@ namespace RTSGame
         {
             while (true)
             {
-                Debug.Log("tick");
                 yield return new WaitForSeconds(1);
-                if (isGathering && heldResource < maxHeldResource)
+                if (isGathering && !heldResources[nodeManager.resourceType].IsFull)
                 {
                     gatheringFrom.GetComponent<NodeManager>().Gather(1);
-                    heldResource++;
-                }            
+                    heldResources[nodeManager.resourceType].AddResource(1);
+                }
             }
         }
 
         void UnloadResources()
         {
             //todo make it general, use a map
-            int remainingCapacity = resourceManager.maxStone - resourceManager.stone;
-            if (remainingCapacity >= heldResource)
+            foreach (ResourceTypes type in heldResources.Keys)
             {
-                resourceManager.stone += heldResource;
-                heldResource = 0;
-                if ((taskManager.taskInProgress as ActionOnObject).HasRoundLimit) (taskManager.taskInProgress as ActionOnObject).roundsFinished++;
+                int remainingCapacity = resourceManager.RemainingCapacity(type);
+
+                resourceManager.AddResource(type, heldResources[type].amount);
+                heldResources[type].AddResource(-Math.Min(remainingCapacity, heldResources[type].amount));
+
+                ActionOnObject currentAction = taskManager.taskInProgress as ActionOnObject;
+                if(currentAction!=null)
+                {
+                    if (resourceManager.RemainingCapacity(type) == 0)
+                        currentAction.roundsFinished = currentAction.maxRounds;
+                    else currentAction.roundsFinished++;
+                }               
+                
 
             }
-            else
-            {
-                heldResource -= remainingCapacity;
-                resourceManager.stone = resourceManager.maxStone;
-                (taskManager.taskInProgress as ActionOnObject).roundsFinished = (taskManager.taskInProgress as ActionOnObject).maxRounds;
-            }
+
         }
 
     }

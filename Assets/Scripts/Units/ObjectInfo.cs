@@ -10,23 +10,23 @@ namespace RTSGame
 {
     public class ObjectInfo : MonoBehaviour
     {
-        public UnitStatus Status
-        {
-            get; set;
-        }
+        public UnitStatus status;
         public PlayerController player;
+        public int price = 1;
 
 
-        public bool isSelected = false;
+
+        internal bool isSelected { get; set; }
         public string objectName;
 
+        RallyPoint rallyPoint;
 
         public GameObject selectionMarker;
 
 
         void Start()
         {
-            Status = UnitStatus.IDLE;
+            status = UnitStatus.IDLE;
 
         }
 
@@ -36,21 +36,29 @@ namespace RTSGame
 
         }
 
-        public void ToggleSelection()
+        public void ToggleSelection(bool direction)
         {
-
-            if (isSelected)
+            isSelected = direction;
+            selectionMarker.SetActive(direction);
+            if (direction)
             {
-                //TODO maybe store with player somehow
-                isSelected = false;
-                selectionMarker.SetActive(false);
+                GameEvent.current.OnObjectActionSent += GetComponent<TaskManager>().CreateTask;
+                GameEvent.current.OnPositionActionSent += GetComponent<TaskManager>().CreateTask;
             }
             else
             {
-                isSelected = true;
-                selectionMarker.SetActive(true);
+                GameEvent.current.OnObjectActionSent -= GetComponent<TaskManager>().CreateTask;
+                GameEvent.current.OnPositionActionSent -= GetComponent<TaskManager>().CreateTask;
             }
-
+        }
+        private void OnDestroy()
+        {
+            GameEvent.current.OnObjectActionSent -= GetComponent<TaskManager>().CreateTask;
+            GameEvent.current.OnPositionActionSent -= GetComponent<TaskManager>().CreateTask;
+        }
+        public void SetRallyPoint(RallyPoint pos)
+        {
+            rallyPoint = pos;
         }
     }
 }

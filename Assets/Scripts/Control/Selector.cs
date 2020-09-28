@@ -4,28 +4,45 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System.Linq;
 
 namespace RTSGame
 {
     public class Selector : MonoBehaviour
     {
-        // Start is called before the first frame update
+
+        //variables for box selection
+        [SerializeField] Box box;
+        Collider[] selection;
+        private Vector3 startPos, dragPos;
+        private Camera cam;
+        private Ray ray;
 
         public TaskQueuePanelControl taskQueuePanelControl;
-        public GameObject selectedObject;
+        public UnitUIManager unitUIManager;
 
         TaskManager taskManagerSelected = null;
 
         bool movingFlag = false;
-        RallyPoint rallyPoint;
-        ObjectInfo selectedInfo;
+
+        [SerializeField] HashSet<ObjectInfo> selectedObjects = new HashSet<ObjectInfo>();
         EventSystem eventSystem;
+
+
+        public CanvasGroup objectPanel;
+
+        public ObjectInfo primaryObject;
+
+        private bool isSelecting;
+        private RallyPoint rallyPointMoved;
+
 
 
 
         void Start()
         {
             eventSystem = FindObjectOfType<EventSystem>();
+            cam = Camera.main;
 
         }
 
@@ -39,118 +56,218 @@ namespace RTSGame
             }
             else
             {
-                GetLeftButtonDown();
-                GetRightButtonDown();
-            }
-
-        }
-
-
-        private void GetRightButtonDown()
-        {
-            if (Input.GetMouseButtonDown(1))
-            {
-                RaycastHit hit;
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out hit))
+                //handling input
+                if (Input.GetMouseButton(0))
                 {
-                    if (taskManagerSelected != null)
+                    GetLeftButtonDown();
+                }
+                if (Input.GetMouseButton(1))
+                {
+                    GetRightButtonDown();
+                }
+                if (Input.GetMouseButtonUp(0))
+                {
+                    if (isSelecting)
                     {
-                        //right click on ground: select where to move
-                        if (hit.collider.CompareTag("Ground"))
+                        selection = Physics.OverlapBox(box.Center, box.Extents, Quaternion.identity);
+                        foreach (var obj in selection)
                         {
-                            Action newAction = new ActionOnPosition(selectedObject, hit.point, ActionType.MOVE);
-                            PutOutNewAction(newAction);                           
+                            ObjectInfo oinfo = obj.GetComponent<ObjectInfo>();
+                            if (obj.CompareTag("Selectable") && oinfo != null && !oinfo.isSelected)
+                            {
+                                Select(oinfo);
+                            }
                         }
-                        else if (hit.collider.CompareTag("Resource"))
-                        {
-                            Action newAction=new ActionOnObject(selectedObject, hit.transform.gameObject, ActionType.HARVEST);
-                            PutOutNewAction(newAction);
-                        }
+                        isSelecting = false;
                     }
                 }
             }
+        }
+        private void GetRightButtonDown()
+        {
+
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out hit))
+            {
+                if (taskManagerSelected != null)
+                {
+                    //right click on ground: select where to move
+                    if (hit.collider.CompareTag("Ground"))
+                    {
+                        PutOutNewAction(hit.point,ActionType.MOVE);
+                    }
+                    else if (hit.collider.CompareTag("Resource"))
+                    {     
+                        PutOutNewAction(hit.transform.gameObject, ActionType.HARVEST, 5);
+                    }
+                }
+            }
+
         }
 
         void GetLeftButtonDown()
         {
-            if (Input.GetMouseButtonDown(0))
+
+            //casting a ray to our pointer
+            RaycastHit hit;
+            ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray, out hit))
             {
-                RaycastHit hit;
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out hit))
+                ObjectInfo objectInfo = hit.transform.GetComponent<ObjectInfo>();
+                if (hit.collider.CompareTag("Ground"))
                 {
-                    if (hit.collider.CompareTag("Ground"))
+                    if (movingFlag)
                     {
-                        if (movingFlag)
-                        {
-                            MoveFlag(hit.point);
-                        }
-                        else if (selectedObject != null)
-                        {
-                            Deselect();
-                        }
-                    }
-                    else if (hit.collider.CompareTag("Selectable"))
-                    {
-                        Select(hit.collider.gameObject);
+                        MoveFlag(hit.point);
                     }
                     else
                     {
-                        //TODO make a separate branch for these
-                        Trainer trainer = hit.transform.gameObject.GetComponent<Trainer>();
-                        rallyPoint = hit.transform.gameObject.GetComponent<RallyPoint>();
-                        if (trainer != null)
+                        if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.LeftShift))
                         {
-                            //TODO add task queue to buildings
-                            trainer.TrainNew();
-
+                            Debug.Log("Starting selection");
+                            startPos = hit.point;
+                            box.baseMinimum = startPos;
+                            isSelecting = true;
                         }
-                        else if (hit.transform.gameObject.CompareTag("RallyFlag") && rallyPoint != null)
+                        else
                         {
-                            movingFlag = true;
+                            ClearSelection();
                         }
                     }
                 }
+                else if (Input.GetMouseButtonDown(0) && hit.collider.CompareTag("Selectable"))
+                {
+                    ClearSelection();
+                    Select(hit.collider.GetComponent<ObjectInfo>());
+                }
+                else
+                {
+                    //TODO make a separate branch for these
+                    Trainer trainer = hit.transform.gameObject.GetComponent<Trainer>();
+                    rallyPointMoved = hit.transform.gameObject.GetComponent<RallyPoint>();
+                    if (trainer != null && Input.GetMouseButtonDown(0))
+                    {
+                        //TODO add task queue to buildings
+                        trainer.TrainNew();
+
+                    }
+                    else if (hit.transform.gameObject.CompareTag("RallyFlag") && rallyPointMoved != null)
+                    {
+                        movingFlag = true;
+                    }
+                }
             }
+            if (isSelecting)
+            {
+                dragPos = hit.point;
+                box.baseMaximum = dragPos;
+            }
+
         }
 
-        void Deselect()
+        void ClearSelection()
         {
-            if (selectedObject != null)
+            if (selectedObjects != null)
             {
-                if (selectedInfo.isSelected) selectedInfo.isSelected = false;
-                selectedObject = null;
-                selectedInfo = null;
-                rallyPoint = null;
+
+                foreach(ObjectInfo i in selectedObjects)
+                {
+                    if (i != null)
+                    {
+                        i.ToggleSelection(false);
+                    }
+                }
+
+                primaryObject = null;
+
+                selectedObjects.Clear();
+
                 movingFlag = false;
                 taskManagerSelected = null;
                 taskQueuePanelControl.ClearActionDisplay();
+
+                unitUIManager.GetComponent<Animator>().SetTrigger("UnitDeselected");
+                unitUIManager.ReleaseGameObject();
             }
         }
-        void Select(GameObject go)
+        void Select(ObjectInfo oInfo)
         {
-            if (selectedObject != null) selectedInfo.ToggleSelection();
+            selectedObjects.Add(oInfo);  
+            oInfo.ToggleSelection(true);
+            if (primaryObject == null) SetPrimary(oInfo);
+        }
 
-            selectedObject = go;
-            selectedInfo = selectedObject.GetComponent<ObjectInfo>();
-            taskManagerSelected = selectedObject.GetComponent<TaskManager>();
+        void SetPrimary(ObjectInfo objectInfo)
+        {
+            if (primaryObject!=null) //if we already have a primary, clear the unit display
+            {
+                unitUIManager.GetComponent<Animator>().SetTrigger("UnitDeselected");
+                unitUIManager.ReleaseGameObject();
+            }
+            primaryObject = objectInfo;
+            taskManagerSelected = objectInfo.GetComponent<TaskManager>();
 
             taskQueuePanelControl.ClearActionDisplay();
             taskQueuePanelControl.DisplayActions(taskManagerSelected);
 
-            selectedInfo.ToggleSelection();
+            unitUIManager.BindGameObject(objectInfo.gameObject);
+            unitUIManager.GetComponent<Animator>().SetTrigger("UnitSelected");
         }
         void MoveFlag(Vector3 dest)
         {
-            rallyPoint.baseConnected.SetNewRallyPoint(dest);
+            rallyPointMoved.baseConnected.SetNewRallyPoint(dest);
             movingFlag = false;
         }
 
-        void PutOutNewAction(Action newAction)
+        void PutOutNewAction(Vector3 pos, ActionType type)
         {
-            taskManagerSelected.AddTask(newAction);
-            taskQueuePanelControl.AddActionItemToDisplay(newAction);
+            GameEvent.current.SendAction(pos, type);
+        }
+        void PutOutNewAction(GameObject target, ActionType type, int roundLimit)
+        {
+            GameEvent.current.SendAction(target, type, roundLimit);
+        }
+
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawCube(box.Center, box.Size);
+        }
+    }
+
+
+}
+[Serializable]
+public class Box
+{
+    public Vector3 baseMinimum, baseMaximum;
+    public Vector3 Center
+    {
+        get
+        {
+            Vector3 center = baseMinimum + (baseMaximum - baseMinimum) * 0.5f;
+            center.y = (baseMaximum - baseMinimum).magnitude * 0.5f;
+
+            return center;
+        }
+    }
+    public Vector3 Size
+    {
+        get
+        {
+            return new Vector3(Mathf.Abs(baseMaximum.x - baseMinimum.x), (baseMaximum - baseMinimum).magnitude, Mathf.Abs(baseMaximum.z - baseMinimum.z));
+
+        }
+    }
+
+    public Vector3 Extents
+    {
+        get
+        {
+            return Size * 0.5f;
         }
     }
 
