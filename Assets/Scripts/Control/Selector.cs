@@ -61,7 +61,7 @@ namespace RTSGame
                 {
                     GetLeftButtonDown();
                 }
-                if (Input.GetMouseButton(1))
+                if (Input.GetMouseButtonDown(1))
                 {
                     GetRightButtonDown();
                 }

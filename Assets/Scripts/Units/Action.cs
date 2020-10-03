@@ -14,7 +14,8 @@ namespace RTSGame
 
         public void Cancel()
         {
-            initiator.GetComponent<TaskManager>().RemoveAction(this);
+            if (initiator != null)
+                initiator.GetComponent<TaskManager>().RemoveAction(this);
         }
         public IsFinishedDelegate IsFinished = null;
         protected bool inProgress = false;
@@ -28,7 +29,13 @@ namespace RTSGame
             initiator = init;
             targetPosition = pos;
             type = at;
-            IsFinished = new IsFinishedDelegate(() => { Vector3 dest = pos;  return initiator.GetComponent<MovementController>().ReachedDestination(dest); });
+            IsFinished = new IsFinishedDelegate(() =>
+            {
+                Vector3 dest = pos;
+                if (initiator != null)
+                    return initiator.GetComponent<MovementController>().ReachedDestination(dest);
+                else return true;
+            });
         }
         public override void Execute()
         {
@@ -43,7 +50,7 @@ namespace RTSGame
                 default: Debug.LogError("No such type of action"); break;
             }
         }
-       
+
     }
 
     public class ActionOnObject : Action
@@ -54,18 +61,18 @@ namespace RTSGame
         public int roundsFinished { get; set; }
 
         public GameObject targetObject;
-        public ActionOnObject(GameObject init, GameObject targ, ActionType at,int roundLimit=0)
+        public ActionOnObject(GameObject init, GameObject targ, ActionType at, int roundLimit = 0)
         {
             initiator = init;
             targetObject = targ;
             type = at;
             maxRounds = roundLimit;
             roundsFinished = 0;
-            IsFinished = new IsFinishedDelegate(() => { return HasRoundLimit && roundLimit<=roundsFinished;});
-            
+            IsFinished = new IsFinishedDelegate(() => { return HasRoundLimit && roundLimit <= roundsFinished; });
+
         }
 
-        
+
 
         public override void Execute()
         {
@@ -74,7 +81,7 @@ namespace RTSGame
                 case ActionType.HARVEST:
                     {
                         initiator.GetComponent<MovementController>().Move(targetObject.transform.position);
-                        initiator.GetComponent<ObjectInfo>().status=UnitStatus.GATHERING;
+                        initiator.GetComponent<ObjectInfo>().status = UnitStatus.GATHERING;
 
                     }
 

@@ -42,7 +42,8 @@ public class Destroyable : MonoBehaviour
     }
     public void Die()
     {
-        gameObject.GetComponent<ObjectInfo>().player.resourceManager.AddResource(ResourceTypes.POPULATION, -1);
+        ObjectInfo oinfo = gameObject.GetComponent<ObjectInfo>();
+        oinfo.player.KillUnit(gameObject);
         Destroy(gameObject);
     }
 }

@@ -17,7 +17,7 @@ namespace RTSGame
         {
             agent = GetComponent<NavMeshAgent>();
             agent.SetDestination(rallyPoint.transform.position);
-            agent.stoppingDistance = 0.5f;
+            agent.stoppingDistance = 0.7f;
             oinfo = GetComponent<ObjectInfo>();
         }
 

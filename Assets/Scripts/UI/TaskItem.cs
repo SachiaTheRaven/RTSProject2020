@@ -8,25 +8,34 @@ namespace RTSGame
 {
     public class TaskItem : MonoBehaviour
     {
-        public Action action;
+        public Action AssignedAction;
+        
+        
         public Button button;
-    void Start()
+        void Start()
         {
             button = GetComponentInChildren<Button>();
             button.onClick.AddListener(OnClick);
 
         }
 
+        
+      public void AssignImage(Sprite image)
+        {
+            button.image.sprite = image;
+        }
+
         void Update()
         {
-            if (action.IsFinished())
+            if (AssignedAction == null || AssignedAction.IsFinished())
             {
                 Destroy(this.gameObject);
             }
         }
         public void OnClick()
         {
-            action.Cancel();
+            if (AssignedAction != null)
+                AssignedAction.Cancel();
             Destroy(this.gameObject);
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 namespace RTSGame
@@ -12,6 +13,8 @@ namespace RTSGame
         ATTACKING,
         DELIVERING
     }
+
+    [Serializable]
     public enum ActionType
         {
         MOVE,
@@ -27,6 +30,12 @@ namespace RTSGame
         POPULATION
 
     };
-   
+
+    public enum GameState
+    {
+        RUNNING,
+        WON,
+        LOST
+    }   
 }
 

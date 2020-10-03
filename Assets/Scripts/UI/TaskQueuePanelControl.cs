@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace RTSGame
 {
@@ -9,6 +11,9 @@ namespace RTSGame
         // Start is called before the first frame update
         public GameObject taskQPanel;
         public GameObject taskPrefab;
+        [SerializeField]
+        public List<DictionaryItem> TaskImages;
+
         void Start()
         {
 
@@ -31,10 +36,14 @@ namespace RTSGame
         {
             GameObject newTaskItem = Instantiate(taskPrefab);
             newTaskItem.transform.SetParent(taskQPanel.transform, false);
-            newTaskItem.GetComponent<TaskItem>().action = action;
+            TaskItem taskItem = newTaskItem.GetComponent<TaskItem>();
+            taskItem.AssignedAction = action;
+            taskItem.AssignImage(TaskImages.Where(x=>x.type==action.type).First().image);
+            Debug.Log("New Task Item");
+
         }
-        
-       
+
+
         public void ClearActionDisplay()
         {
             foreach (Transform child in taskQPanel.transform)
