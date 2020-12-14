@@ -28,11 +28,11 @@ namespace RTSGame
         {
             status = UnitStatus.IDLE;
 
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
+            if(player!=null)
+            {
+                player.units.Add(gameObject);
+                player.AddFriendlyUnit(this.gameObject);
+            }
 
         }
 
@@ -51,14 +51,27 @@ namespace RTSGame
                 GameEvent.current.OnPositionActionSent -= GetComponent<TaskManager>().CreateTask;
             }
         }
-        private void OnDestroy()
-        {
-            GameEvent.current.OnObjectActionSent -= GetComponent<TaskManager>().CreateTask;
-            GameEvent.current.OnPositionActionSent -= GetComponent<TaskManager>().CreateTask;
-        }
+        
         public void SetRallyPoint(RallyPoint pos)
         {
             rallyPoint = pos;
         }
+        private void OnTriggerEnter(Collider other)
+        {
+            if(other.CompareTag("Enemy"))
+            {
+                player.AddEnemyInRange(other.gameObject);
+            }
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            if(other.CompareTag("Enemy"))
+            {
+                player.RemoveEnemyFromRange(other.gameObject);
+            }
+        }
     }
+
+    
 }

@@ -10,9 +10,13 @@ namespace RTSGame
         public int currentSeconds = 0;
         private int timeLimit = 60;
         public TextMeshProUGUI timerText;
+        GameController gc;
         void Start()
         {
+            gc = FindObjectOfType<GameController>();
+
             StartCoroutine("Tick");
+
         }
 
 
@@ -22,10 +26,15 @@ namespace RTSGame
             {
                 yield return new WaitForSeconds(1);
                 currentSeconds++;
-                DisplayTime();
+                if (FindObjectOfType<GameController>().UIon)
+                {
+                    DisplayTime();
+                }
                 if (currentSeconds >= timeLimit)
                 {
-                    FindObjectOfType<GameController>().CurrentGameState = GameState.WON;
+                    //gc.CurrentGameState = GameState.WON;
+                    gc.players.ForEach(x=>x.AddReward(1.0f));
+                    gc.players.ForEach(x => x.EndEpisode());
 
                 }
             }
@@ -33,6 +42,7 @@ namespace RTSGame
         }
         private void DisplayTime()
         {
+
             timerText.text = currentSeconds / 60 + ":" + currentSeconds % 60;
         }
     }

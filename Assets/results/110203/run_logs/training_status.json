@@ -1,0 +1,23 @@
+{
+    "PlayerContinuous": {
+        "checkpoints": [
+            {
+                "steps": 2144,
+                "file_path": "results\\110203\\PlayerContinuous\\PlayerContinuous-2144.nn",
+                "reward": -14.354516020897895,
+                "creation_time": 1604331981.3807266
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 2144,
+            "file_path": "results\\110203\\PlayerContinuous.nn",
+            "reward": -14.354516020897895,
+            "creation_time": 1604331981.3807266
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.1.0",
+        "mlagents_version": "0.20.0",
+        "tensorflow_version": "2.3.1"
+    }
+}

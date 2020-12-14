@@ -10,6 +10,7 @@ TagManager:
   - Selectable
   - Resource
   - DropPoint
+  - Enemy
   layers:
   - Default
   - TransparentFX

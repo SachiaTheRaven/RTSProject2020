@@ -1,0 +1,29 @@
+{
+    "PlayerContinuous": {
+        "checkpoints": [
+            {
+                "steps": 499990,
+                "file_path": "results\\session_112901\\PlayerContinuous\\PlayerContinuous-499990.nn",
+                "reward": 7.350000381469727,
+                "creation_time": 1606675960.962328
+            },
+            {
+                "steps": 500120,
+                "file_path": "results\\session_112901\\PlayerContinuous\\PlayerContinuous-500120.nn",
+                "reward": 7.350000381469727,
+                "creation_time": 1606675961.6478214
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 500120,
+            "file_path": "results\\session_112901\\PlayerContinuous.nn",
+            "reward": 7.350000381469727,
+            "creation_time": 1606675961.6478214
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.1.0",
+        "mlagents_version": "0.20.0",
+        "tensorflow_version": "2.3.1"
+    }
+}

@@ -1823,7 +1823,7 @@ GameObject:
   - component: {fileID: 776257248}
   m_Layer: 2
   m_Name: Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2091,6 +2091,7 @@ GameObject:
   - component: {fileID: 878123944}
   - component: {fileID: 878123946}
   - component: {fileID: 878123947}
+  - component: {fileID: 878123948}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -2110,6 +2111,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f684312718c0f240bd0e0d1f1ba8361, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  agentParameters:
+    maxStep: 0
+  hasUpgradedFromAgentParameters: 1
+  MaxStep: 0
   selector: {fileID: 878123946}
   resourceManager: {fileID: 878123947}
 --- !u!4 &878123945
@@ -2162,6 +2167,32 @@ MonoBehaviour:
   foodDisplay: {fileID: 591683968}
   goldDisplay: {fileID: 1542196659}
   populationDisplay: {fileID: 921142608}
+--- !u!114 &878123948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 878123943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_BrainParameters:
+    VectorObservationSize: 2
+    NumStackedVectorObservations: 1
+    VectorActionSize: 01000000
+    VectorActionDescriptions: []
+    VectorActionSpaceType: 0
+  m_Model: {fileID: 0}
+  m_InferenceDevice: 0
+  m_BehaviorType: 0
+  m_BehaviorName: Player
+  TeamId: 0
+  m_UseChildSensors: 1
+  m_UseChildActuators: 1
+  m_ObservableAttributeHandling: 0
 --- !u!1 &893383502
 GameObject:
   m_ObjectHideFlags: 0
@@ -2352,6 +2383,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 784fe02d158fb004084caf19fd9f6183, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentPlayer: {fileID: 0}
 --- !u!4 &910271132
 Transform:
   m_ObjectHideFlags: 0

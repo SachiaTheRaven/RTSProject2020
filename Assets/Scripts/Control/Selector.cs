@@ -25,7 +25,8 @@ namespace RTSGame
 
         bool movingFlag = false;
 
-        [SerializeField] HashSet<ObjectInfo> selectedObjects = new HashSet<ObjectInfo>();
+        [SerializeField]
+        public HashSet<ObjectInfo> selectedObjects = new HashSet<ObjectInfo>();
         EventSystem eventSystem;
 
 
@@ -50,7 +51,7 @@ namespace RTSGame
         void Update()
         {
 
-            if (eventSystem.currentSelectedGameObject != null && eventSystem.currentSelectedGameObject.layer == 5)
+            if (eventSystem != null && eventSystem.currentSelectedGameObject != null && eventSystem.currentSelectedGameObject.layer == 5)
             {
                 return;
             }
@@ -95,10 +96,10 @@ namespace RTSGame
                     //right click on ground: select where to move
                     if (hit.collider.CompareTag("Ground"))
                     {
-                        PutOutNewAction(hit.point,ActionType.MOVE);
+                        PutOutNewAction(hit.point, ActionType.MOVE);
                     }
                     else if (hit.collider.CompareTag("Resource"))
-                    {     
+                    {
                         PutOutNewAction(hit.transform.gameObject, ActionType.HARVEST, 5);
                     }
                 }
@@ -167,16 +168,17 @@ namespace RTSGame
 
         }
 
-        void ClearSelection()
+        public void ClearSelection()
         {
             if (selectedObjects != null)
             {
 
-                foreach(ObjectInfo i in selectedObjects)
+                foreach (ObjectInfo i in selectedObjects)
                 {
                     if (i != null)
                     {
                         i.ToggleSelection(false);
+                       
                     }
                 }
 
@@ -186,34 +188,41 @@ namespace RTSGame
 
                 movingFlag = false;
                 taskManagerSelected = null;
-                taskQueuePanelControl.ClearActionDisplay();
+                if (FindObjectOfType<GameController>().UIon)
+                {
+                    taskQueuePanelControl.ClearActionDisplay();
+                    unitUIManager.GetComponent<Animator>().SetTrigger("UnitDeselected");
+                    unitUIManager.ReleaseGameObject();
+                }
 
-                unitUIManager.GetComponent<Animator>().SetTrigger("UnitDeselected");
-                unitUIManager.ReleaseGameObject();
+                
             }
         }
-        void Select(ObjectInfo oInfo)
+        public void Select(ObjectInfo oInfo)
         {
-            selectedObjects.Add(oInfo);  
+            selectedObjects.Add(oInfo);
             oInfo.ToggleSelection(true);
             if (primaryObject == null) SetPrimary(oInfo);
         }
 
         void SetPrimary(ObjectInfo objectInfo)
         {
-            if (primaryObject!=null) //if we already have a primary, clear the unit display
+            if (primaryObject != null) //if we already have a primary, clear the unit display
             {
                 unitUIManager.GetComponent<Animator>().SetTrigger("UnitDeselected");
                 unitUIManager.ReleaseGameObject();
             }
             primaryObject = objectInfo;
             taskManagerSelected = objectInfo.GetComponent<TaskManager>();
+            if(FindObjectOfType<GameController>().UIon)
+            {
+                taskQueuePanelControl.ClearActionDisplay();
+                taskQueuePanelControl.DisplayActions(taskManagerSelected);
 
-            taskQueuePanelControl.ClearActionDisplay();
-            taskQueuePanelControl.DisplayActions(taskManagerSelected);
-
-            unitUIManager.BindGameObject(objectInfo.gameObject);
-            unitUIManager.GetComponent<Animator>().SetTrigger("UnitSelected");
+                unitUIManager.BindGameObject(objectInfo.gameObject);
+                unitUIManager.GetComponent<Animator>().SetTrigger("UnitSelected");
+            }
+           
         }
         void MoveFlag(Vector3 dest)
         {
@@ -221,11 +230,11 @@ namespace RTSGame
             movingFlag = false;
         }
 
-        void PutOutNewAction(Vector3 pos, ActionType type)
+        public void PutOutNewAction(Vector3 pos, ActionType type)
         {
             GameEvent.current.SendAction(pos, type);
         }
-        void PutOutNewAction(GameObject target, ActionType type, int roundLimit)
+        public void PutOutNewAction(GameObject target, ActionType type, int roundLimit)
         {
             GameEvent.current.SendAction(target, type, roundLimit);
         }
@@ -235,6 +244,25 @@ namespace RTSGame
         {
             Gizmos.color = Color.red;
             Gizmos.DrawCube(box.Center, box.Size);
+        }
+        //gets distance between primary object and closest enemy
+        //TODO somehow do this for all units
+        public float GetDistanceOfClosestEnemy()
+        {
+            List<GameObject> enemies = GameObject.FindGameObjectsWithTag("Enemy").ToList();
+            if (enemies.Count > 0 && primaryObject != null)
+            {
+                var closest = enemies.Min(x =>
+                {
+                    return (primaryObject.transform.position - x.transform.position).magnitude;
+                }
+                );
+                return closest;
+            }
+            else return -1.0f;
+           
+           
+
         }
     }
 

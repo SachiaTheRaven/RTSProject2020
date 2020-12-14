@@ -6,7 +6,6 @@ namespace RTSGame
 {
     public class ResourceManager : MonoBehaviour
     {
-        
 
         Dictionary<ResourceTypes, int> resources;
         Dictionary<ResourceTypes, int> maxResources;
@@ -38,11 +37,16 @@ namespace RTSGame
         //TODO: auto-generate panels from prefabs
         void Update()
         {
-            stoneDisplay.text = resources[ResourceTypes.STONE].ToString() + "/" + maxResources[ResourceTypes.STONE].ToString();
-            ironDisplay.text = resources[ResourceTypes.IRON].ToString() + "/" + maxResources[ResourceTypes.IRON].ToString();
-            foodDisplay.text = resources[ResourceTypes.FOOD].ToString() + "/" + maxResources[ResourceTypes.FOOD].ToString();
-            goldDisplay.text = resources[ResourceTypes.GOLD].ToString() + "/" + maxResources[ResourceTypes.GOLD].ToString();
-            populationDisplay.text = resources[ResourceTypes.POPULATION].ToString() + "/" + maxResources[ResourceTypes.POPULATION].ToString();
+            
+            if(FindObjectOfType<GameController>().UIon)
+            {
+                stoneDisplay.text = resources[ResourceTypes.STONE].ToString() + "/" + maxResources[ResourceTypes.STONE].ToString();
+                ironDisplay.text = resources[ResourceTypes.IRON].ToString() + "/" + maxResources[ResourceTypes.IRON].ToString();
+                foodDisplay.text = resources[ResourceTypes.FOOD].ToString() + "/" + maxResources[ResourceTypes.FOOD].ToString();
+                goldDisplay.text = resources[ResourceTypes.GOLD].ToString() + "/" + maxResources[ResourceTypes.GOLD].ToString();
+                populationDisplay.text = resources[ResourceTypes.POPULATION].ToString() + "/" + maxResources[ResourceTypes.POPULATION].ToString();
+            }
+            
         }
 
         public int RemainingCapacity(ResourceTypes type)

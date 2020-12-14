@@ -52,17 +52,19 @@ namespace RTSGame
         }
 
         //TODO ez valószínűleg felesleges duplicate
-        
+
         public void CreateTask(Vector3 pos, ActionType type)
         {
             Action action = new ActionOnPosition(gameObject, pos, type);
             AddTask(action);
-            FindObjectOfType<TaskQueuePanelControl>().AddActionItemToDisplay(action);
+
+            if (FindObjectOfType<GameController>().UIon)
+                FindObjectOfType<TaskQueuePanelControl>().AddActionItemToDisplay(action);
 
         }
         public void CreateTask(GameObject target, ActionType type, int roundLimit)
         {
-            Action action = new ActionOnObject(gameObject, target,type,roundLimit);
+            Action action = new ActionOnObject(gameObject, target, type, roundLimit);
             AddTask(action);
             FindObjectOfType<TaskQueuePanelControl>().AddActionItemToDisplay(action);
         }
@@ -72,16 +74,22 @@ namespace RTSGame
             objectInfo.status = UnitStatus.IDLE;
         }
 
-        public void RemoveAction( Action toBeRemoved)
+        public void RemoveAction(Action toBeRemoved)
         {
-            if(toBeRemoved==taskInProgress)
+            if (toBeRemoved == taskInProgress)
             {
                 CancelAction();
             }
             else
             {
-                taskList.Remove(toBeRemoved);                
+                taskList.Remove(toBeRemoved);
             }
+        }
+
+        private void OnDestroy()
+        {
+            GameEvent.current.OnObjectActionSent -= CreateTask;
+            GameEvent.current.OnPositionActionSent -= GetComponent<TaskManager>().CreateTask;
         }
     }
 }

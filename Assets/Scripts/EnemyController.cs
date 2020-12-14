@@ -66,9 +66,10 @@ namespace RTSGame
                 attackCooldown = 0.0f;
             }
         }
+        //TODO remove dead person from attack list
         private Transform GetNewTarget()
         {
-            List<Transform> inAttackRange = inRange.Where(potentionalTarget => Vector3.Distance(potentionalTarget.position, transform.position) < followRadius).ToList();
+            List<Transform> inAttackRange = inRange.Where(potentionalTarget =>potentionalTarget!=null && Vector3.Distance(potentionalTarget.position, transform.position) < followRadius).ToList();
             if (inAttackRange.Count > 0)
             {
                 var target = inAttackRange.FirstOrDefault();
