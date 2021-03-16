@@ -6,7 +6,7 @@ using UnityEngine;
 namespace RTSGame
 {
 
-    public class NodeManager : MonoBehaviour
+    public class NodeManager : GeneralBuilding
     {
         public ResourceTypes resourceType;
         public float availableResource;

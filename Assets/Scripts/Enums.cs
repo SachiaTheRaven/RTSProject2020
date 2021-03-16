@@ -27,7 +27,8 @@ namespace RTSGame
         IRON,
         GOLD,
         FOOD,
-        POPULATION
+        POPULATION,
+        BUILDINGS
 
     };
 

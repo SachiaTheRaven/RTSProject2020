@@ -10,12 +10,16 @@ namespace RTSGame
         public Action taskInProgress;
         public int maxNumberOfTasks = 10;
 
-        ObjectInfo objectInfo;
+       ObjectInfo objectInfo;
+        DamageDealer dmg;
+
+
 
         void Start()
         {
             taskList = new List<Action>();
             objectInfo = GetComponent<ObjectInfo>();
+            dmg = GetComponent<DamageDealer>();
 
         }
 
@@ -40,13 +44,43 @@ namespace RTSGame
         }
         private void AddTask(Action action)
         {
-            if (taskList.Count < maxNumberOfTasks)
+            //check if in combat
+            if(dmg!=null&& !dmg.inCombat)
             {
-                taskList.Add(action);
+                //if it's an attack, switch to combat mode
+                if (action.type == ActionType.ATTACK)
+                {
+                    dmg.inCombat = true;
+                    foreach( var task in taskList)
+                    {
+                        RemoveAction(task);
+                    }
+                    taskList.Add(action);
+                    
+                }
+                else //if not, commence normally
+                {
+                    if (taskList.Count < maxNumberOfTasks)
+                    {
+                        taskList.Add(action);
+                    }
+                    else
+                    {
+                        //TODO valami effektet megjeleníteni
+                    }
+                }
             }
-            else
+            else  //if in combat deny non-combat action types
             {
-                //TODO valami effektet megjeleníteni
+                if(action.type==ActionType.ATTACK)
+                {
+                    taskList.Add(action);
+                }
+                else
+                {
+                    Debug.Log("Can't do that while in combat");
+                }
+
             }
 
         }

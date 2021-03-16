@@ -9,7 +9,6 @@ using UnityEngine.UIElements;
 
 namespace RTSGame
 {
-
     public class GatheringController : MonoBehaviour
     {
         //references to other components of this go we use multiple times
@@ -168,7 +167,6 @@ namespace RTSGame
 
         void UnloadResources()
         {
-            //todo make it general, use a map
             foreach (ResourceTypes type in heldResources.Keys)
             {
                 int remainingCapacity = resourceManager.RemainingCapacity(type);

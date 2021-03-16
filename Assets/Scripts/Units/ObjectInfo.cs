@@ -5,7 +5,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
-//TODO: cancel tasks --> auto-sense finishing criteria?
 namespace RTSGame
 {
     public class ObjectInfo : MonoBehaviour
@@ -13,8 +12,6 @@ namespace RTSGame
         public UnitStatus status;
         public PlayerController player;
         public int price = 1;
-
-
 
         internal bool isSelected { get; set; }
         public string objectName;

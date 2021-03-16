@@ -8,6 +8,8 @@ using System.Linq;
 
 namespace RTSGame
 {
+
+    //TODO this is such a god class that MXTX would write a bl novel about it
     public class Selector : MonoBehaviour
     {
 
@@ -17,6 +19,8 @@ namespace RTSGame
         private Vector3 startPos, dragPos;
         private Camera cam;
         private Ray ray;
+
+        public Builder builder;
 
         public TaskQueuePanelControl taskQueuePanelControl;
         public UnitUIManager unitUIManager;
@@ -36,6 +40,10 @@ namespace RTSGame
 
         private bool isSelecting;
         private RallyPoint rallyPointMoved;
+
+        //TODO separate this pls, it's ugly
+        private bool isBuilding = false;
+        GameObject buildingproto;
 
 
 
@@ -93,6 +101,7 @@ namespace RTSGame
             {
                 if (taskManagerSelected != null)
                 {
+                    Debug.Log(hit.transform.gameObject.name);
                     //right click on ground: select where to move
                     if (hit.collider.CompareTag("Ground"))
                     {
@@ -101,6 +110,11 @@ namespace RTSGame
                     else if (hit.collider.CompareTag("Resource"))
                     {
                         PutOutNewAction(hit.transform.gameObject, ActionType.HARVEST, 5);
+                    }
+                    else if (hit.collider.CompareTag("Enemy")) // if we have a unit selected and we hit an enemy
+                    {
+                        Debug.Log("AAAATTAAAACK");
+                        PutOutNewAction(hit.transform.gameObject, ActionType.ATTACK, 0);
                     }
                 }
             }
@@ -123,6 +137,12 @@ namespace RTSGame
                     {
                         MoveFlag(hit.point);
                     }
+                    else if (isBuilding)
+                    {
+                        builder.PlaceBuilding(buildingproto, new Vector3(hit.point.x, 0.5f, hit.point.z));
+                        isBuilding = false;
+                        buildingproto = null;
+                    }
                     else
                     {
                         if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.LeftShift))
@@ -134,15 +154,16 @@ namespace RTSGame
                         }
                         else
                         {
-                            ClearSelection();
+                            if (selectedObjects.Count != 0) ClearSelection();
                         }
                     }
                 }
                 else if (Input.GetMouseButtonDown(0) && hit.collider.CompareTag("Selectable"))
                 {
-                    ClearSelection();
+                    if (selectedObjects.Count != 0) ClearSelection();
                     Select(hit.collider.GetComponent<ObjectInfo>());
                 }
+
                 else
                 {
                     //TODO make a separate branch for these
@@ -170,6 +191,7 @@ namespace RTSGame
 
         public void ClearSelection()
         {
+            Debug.Log("Selection cleared");
             if (selectedObjects != null)
             {
 
@@ -178,7 +200,7 @@ namespace RTSGame
                     if (i != null)
                     {
                         i.ToggleSelection(false);
-                       
+
                     }
                 }
 
@@ -190,12 +212,12 @@ namespace RTSGame
                 taskManagerSelected = null;
                 if (FindObjectOfType<GameController>().UIon)
                 {
-                    taskQueuePanelControl.ClearActionDisplay();
-                    unitUIManager.GetComponent<Animator>().SetTrigger("UnitDeselected");
+                    ReleaseUI();
+                    Debug.Log("Unit Deselected Trigger Released");
                     unitUIManager.ReleaseGameObject();
                 }
 
-                
+
             }
         }
         public void Select(ObjectInfo oInfo)
@@ -207,22 +229,23 @@ namespace RTSGame
 
         void SetPrimary(ObjectInfo objectInfo)
         {
-            if (primaryObject != null) //if we already have a primary, clear the unit display
+            Debug.Log("primary selected");
+            if (primaryObject != null && primaryObject != objectInfo) //if we already have a primary, clear the unit display
             {
-                unitUIManager.GetComponent<Animator>().SetTrigger("UnitDeselected");
-                unitUIManager.ReleaseGameObject();
+                Debug.Log("we still have a primary");
+                ReleaseUI();
             }
             primaryObject = objectInfo;
             taskManagerSelected = objectInfo.GetComponent<TaskManager>();
-            if(FindObjectOfType<GameController>().UIon)
+            if (FindObjectOfType<GameController>().UIon)
             {
                 taskQueuePanelControl.ClearActionDisplay();
                 taskQueuePanelControl.DisplayActions(taskManagerSelected);
 
-                unitUIManager.BindGameObject(objectInfo.gameObject);
-                unitUIManager.GetComponent<Animator>().SetTrigger("UnitSelected");
+                BindUI(objectInfo.gameObject);
+                Debug.Log("Unit Selected Trigger Released");
             }
-           
+
         }
         void MoveFlag(Vector3 dest)
         {
@@ -239,7 +262,16 @@ namespace RTSGame
             GameEvent.current.SendAction(target, type, roundLimit);
         }
 
-
+        public void ReleaseUI()
+        {
+            unitUIManager.GetComponent<Animator>().SetTrigger("UnitDeselected");
+            unitUIManager.ReleaseGameObject();
+        }
+        public void BindUI(GameObject go)
+        {
+            unitUIManager.BindGameObject(go);
+            unitUIManager.GetComponent<Animator>().SetTrigger("UnitSelected");
+        }
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.red;
@@ -263,6 +295,13 @@ namespace RTSGame
            
            
 
+        }
+
+        public void StartBuilding(GameObject bp)
+        {
+            isBuilding = true;
+            buildingproto = bp;
+            ClearSelection();
         }
     }
 

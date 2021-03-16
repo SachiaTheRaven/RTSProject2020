@@ -55,7 +55,6 @@ namespace RTSGame
 
     public class ActionOnObject : Action
     {
-        //TODO: set IsFinished
         public bool HasRoundLimit { get { return maxRounds != 0; } }
         public int maxRounds { get; set; }
         public int roundsFinished { get; set; }
@@ -68,7 +67,19 @@ namespace RTSGame
             type = at;
             maxRounds = roundLimit;
             roundsFinished = 0;
-            IsFinished = new IsFinishedDelegate(() => { return HasRoundLimit && roundLimit <= roundsFinished; });
+            switch(at)
+            {
+                case ActionType.HARVEST:
+                    {
+                        IsFinished = new IsFinishedDelegate(() => { return HasRoundLimit && roundLimit <= roundsFinished; });
+                    } break;
+                case ActionType.ATTACK:
+                    {
+                        IsFinished = new IsFinishedDelegate(() => { return (HasRoundLimit && roundLimit <= roundsFinished )|| targetObject==null; });
+
+                    }
+                    break;
+            }
 
         }
 
@@ -76,15 +87,23 @@ namespace RTSGame
 
         public override void Execute()
         {
+            MovementController mc = initiator.GetComponent<MovementController>();
+            ObjectInfo oi = initiator.GetComponent<ObjectInfo>();
             switch (type)
             {
                 case ActionType.HARVEST:
                     {
-                        initiator.GetComponent<MovementController>().Move(targetObject.transform.position);
-                        initiator.GetComponent<ObjectInfo>().status = UnitStatus.GATHERING;
+                        mc.Move(targetObject.transform.position);
+                        oi.status = UnitStatus.GATHERING;
 
                     }
-
+                    break;
+                case ActionType.ATTACK:
+                    {
+                        mc.Move(targetObject.transform.position);
+                        oi.status = UnitStatus.ATTACKING;
+                        oi.GetComponent<DamageDealer>().SetTarget(targetObject.GetComponent<Destroyable>());
+                    }
                     break;
                 default: Debug.LogError("No such type of action"); break;
 

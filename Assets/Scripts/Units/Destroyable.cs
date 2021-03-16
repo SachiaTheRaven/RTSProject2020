@@ -7,6 +7,8 @@ public class Destroyable : MonoBehaviour
 {
     public int maxHP;
     public int hp;
+    private DamageDealer dmg;
+    private GameObject lastAttacker;
     public int Hp
     {
         get { return hp; }
@@ -18,22 +20,31 @@ public class Destroyable : MonoBehaviour
                 hp = 0;
                 Die();
             }
-            else hp = value;
+            else
+            {
+                var attacker = lastAttacker.GetComponent<Destroyable>();
+                if (value<hp && dmg!=null && !dmg.inCombat && attacker!=null)
+                {
+                    dmg.FightBack(attacker);
+                }
+                hp = value;
+            }
         }
 
     }
     public float HealthPercentage { get { return maxHP != 0 ? (float)Hp / (float)maxHP : 0; } }
     void Start()
     {
-
+        dmg = GetComponent<DamageDealer>();
     }
 
     // Update is called once per frame
     void Update()
     {
     }
-    public void Damage(int amount)
+    public void Damage(int amount,GameObject attacker)
     {
+        lastAttacker = attacker;
         Hp -= amount;
     }
     public void Heal(int amount)
@@ -43,7 +54,7 @@ public class Destroyable : MonoBehaviour
     public void Die()
     {
         ObjectInfo oinfo = gameObject.GetComponent<ObjectInfo>();
-        oinfo.player.KillUnit(gameObject);
+        if(oinfo!=null && oinfo.player!=null)oinfo.player.KillUnit(gameObject);
         Destroy(gameObject);
     }
 }

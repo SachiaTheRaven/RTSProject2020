@@ -5,15 +5,13 @@ using UnityEngine;
 
 namespace RTSGame
 {
-    public class Trainer : MonoBehaviour
+    public class Trainer : GeneralBuilding
     {
         public GameObject unitPrototype;
         public GameObject rallyPoint;
         public GameObject rallyFlag;
         public Transform taskListPanel;
         GameObject unitParent;
-        public PlayerController player;
-        public int price;
         public TextMeshPro cdText;
         bool isDone = true;
         bool movingFlag = false;
@@ -40,7 +38,7 @@ namespace RTSGame
         public void CreateUnit()
         {
             GameObject newGO = Instantiate(unitPrototype, unitParent.transform);
-            Vector3 newPos = newGO.transform.position + Random.insideUnitSphere * Random.Range(1, 5);
+            Vector3 newPos = transform.position+ Random.insideUnitSphere * Random.Range(1, 5);
             newGO.transform.position = new Vector3(newPos.x, 0.5f, newPos.z);
 
             newGO.GetComponent<MovementController>().rallyPoint = rallyPoint;

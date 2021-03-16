@@ -10,66 +10,54 @@ namespace RTSGame
     {
         public float lookRadius = 10f;
         public float followRadius = 5.0f;
-        public float attackRadius = 0.25f;
-        public float attackSpeed = 1.0f;
-        public float attackCooldown = 0.0f;
-        public int attackDamage = 10;
         // TODO ezt szétszedni külön komponensbe.
         //ScriptableObject? Egységenként, de inkább támadásonként
 
-        List<Transform> inRange;
-        public Transform target = null;
+
+        DamageDealer dmg;
+        List<Destroyable> inRange;
+        //public Transform target = null;
         NavMeshAgent agent;
         void Start()
         {
-            inRange = new List<Transform>();
+            inRange = new List<Destroyable>();
             agent = GetComponent<NavMeshAgent>();
             GetComponent<CapsuleCollider>().radius = lookRadius;
-            attackCooldown = attackSpeed;
+            dmg= GetComponent<DamageDealer>();
         }
 
-        //TODO add tracking culling
         void Update()
         {
-            attackCooldown += Time.deltaTime;
-            if (target == null)
+            if (!dmg.HasTarget())
             {
                 if (inRange.Count > 0)
                 {
-                    target = GetNewTarget();
-                    if (target != null) inRange.Remove(target);
+                    var target = GetNewTarget();
+                    if (target != null)
+                    {
+                        inRange.Remove(target);
+                        dmg.inCombat = true; //TODO bad design, move to DMG
+                        dmg.SetTarget(target);
+                    }
 
                 }
             }
             else
             {
-                float distance = Vector3.Distance(target.position, transform.position);
-                if (distance > followRadius) target = null;
+                float distance = dmg.GetTargetDistance();
+                if (distance > followRadius) dmg.ClearTarget();
                 else
                 {
-                    agent.SetDestination(target.position);
-
-                    if (distance < attackRadius)
-                    {
-                        Attack(target.GetComponent<Destroyable>());
-                    }
-
+                    agent.SetDestination(dmg.GetTargetPosition());
                 }
 
             }
         }
-        void Attack(Destroyable target)
+       
+        //TODO remove dead person from attack list - is this still a problem?
+        private Destroyable GetNewTarget()
         {
-            if(attackCooldown>attackSpeed)
-            {
-                target.Damage(attackDamage);
-                attackCooldown = 0.0f;
-            }
-        }
-        //TODO remove dead person from attack list
-        private Transform GetNewTarget()
-        {
-            List<Transform> inAttackRange = inRange.Where(potentionalTarget =>potentionalTarget!=null && Vector3.Distance(potentionalTarget.position, transform.position) < followRadius).ToList();
+            List<Destroyable> inAttackRange = inRange.Where(potentionalTarget =>potentionalTarget!=null && Vector3.Distance(potentionalTarget.transform.position, transform.position) < followRadius).ToList();
             if (inAttackRange.Count > 0)
             {
                 var target = inAttackRange.FirstOrDefault();
@@ -86,12 +74,14 @@ namespace RTSGame
         }
         public void OnTriggerEnter(Collider other)
         {
-            if (other.gameObject.CompareTag("Selectable")) inRange.Add(other.transform);
+            var dest = other.GetComponent<Destroyable>();
+            if (other.gameObject.CompareTag("Selectable") && dest!=null) inRange.Add(dest);
         }
 
         public void OnTriggerExit(Collider other)
         {
-            if (other.gameObject.CompareTag("Selectable")) inRange.Remove(other.transform);
+            var dest = other.GetComponent<Destroyable>();
+            if (other.gameObject.CompareTag("Selectable")&& dest!=null) inRange.Remove(dest);
 
         }
     }

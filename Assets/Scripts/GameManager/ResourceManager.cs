@@ -26,12 +26,14 @@ namespace RTSGame
             resources.Add(ResourceTypes.STONE, 0);
             resources.Add(ResourceTypes.POPULATION, 0);
             resources.Add(ResourceTypes.GOLD, 150);
+            resources.Add(ResourceTypes.BUILDINGS, 3);
             
             maxResources.Add(ResourceTypes.FOOD, 100);
             maxResources.Add(ResourceTypes.IRON, 100);
             maxResources.Add(ResourceTypes.STONE, 100);
             maxResources.Add(ResourceTypes.POPULATION, 100);
             maxResources.Add(ResourceTypes.GOLD, 1000);
+            maxResources.Add(ResourceTypes.BUILDINGS, 10);
         }
 
         //TODO: auto-generate panels from prefabs

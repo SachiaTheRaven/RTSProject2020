@@ -18,8 +18,10 @@ namespace RTSGame
         // Start is called before the first frame update
         public GameObject unitProto;
         public ObservableCollection<GameObject> units;
+        public List<GameObject> buildings;
         public Selector selector;
         public ResourceManager resourceManager;
+        public bool isLearning = false;
 
         //A key-value set of enemy units in range
         Dictionary<GUID, GameObject> EnemiesInRange = new Dictionary<GUID, GameObject>();
@@ -31,19 +33,19 @@ namespace RTSGame
 
         }
 
-        public void WriteToFile(string message)
+       /* public void WriteToFile(string message)
         {
             using (StreamWriter filewriter = File.AppendText(helpimlostfile))
             {
                 filewriter.WriteLine(System.DateTime.Now+"-" +message);
             }
-        }
-        private void Awake()
+        }*/
+       /* private void Awake()
         {
             helpimlostfile = Application.persistentDataPath + "this is why nobody likes you my child.txt";
             
             Debug.Log(Application.persistentDataPath);
-        }
+        }*/
         public override void Initialize()
         {
             //moved from Start
@@ -65,24 +67,24 @@ namespace RTSGame
             var dist = selector.GetDistanceOfClosestEnemy();
             sensor.AddObservation(1/dist);
             //TODO: figure out what else to observe
-            WriteToFile("Collecting Observations" + sumhealth + " - " + 1/dist);
+            //WriteToFile("Collecting Observations" + sumhealth + " - " + 1/dist);
 
         }
         public override void OnActionReceived(float[] vectorAction)
         {
-            WriteToFile("Action recieved:");
+            //WriteToFile("Action recieved:");
 
             AddReward(0.05f); //congrats you're alive
             //switch on actiontype: discreteactions
             switch (vectorAction[0])
             {
                 case float n when (n>=0.0 && n<0.1): //idle         
-                    WriteToFile("Nothing!");
+              //      WriteToFile("Nothing!");
 
                     break;
                 case float n when (n >=0.1 && n < 0.2): //move
                     {
-                        WriteToFile("Move!");
+                      //  WriteToFile("Move!");
                         if(selector.primaryObject==null)
                         {
                             //What are you doing? There's nothing to move
@@ -98,7 +100,7 @@ namespace RTSGame
                     
                     } break;
                 case float n when (n >=0.2 && n < 0.3): //train
-                    WriteToFile("we can't even train yet lol");
+                    //WriteToFile("we can't even train yet lol");
 
                     break;
                 case float n when (n >= 0.3 && n < 0.4): //select unit
@@ -117,7 +119,7 @@ namespace RTSGame
                         }
                                                
                         int id = Mathf.RoundToInt(Mathf.Abs(vectorAction[1])*(FriendlyUnits.Count()-1));
-                        WriteToFile("Selection! "+ id);
+                       // WriteToFile("Selection! "+ id);
 
                         if (FriendlyUnits[id]!=null)
                         {
@@ -129,13 +131,13 @@ namespace RTSGame
                     }
                     break;
                 case float n when (n >= 0.4 && n < 0.5): //select resource        
-                    WriteToFile("No resources for nasty AI");
+                    //WriteToFile("No resources for nasty AI");
 
                     break;
                 default:
                     {
                         AddReward(-0.5f);
-                        WriteToFile("You can't do that lol: " + vectorAction[0]);
+                      //  WriteToFile("You can't do that lol: " + vectorAction[0]);
                     } break;
             }
         }
@@ -153,21 +155,25 @@ namespace RTSGame
 
         public override void OnEpisodeBegin()
         {
-            FriendlyUnits.Clear();
-            var unitsPresent = FindObjectsOfType<ObjectInfo>().Where(x=>x.player==this).ToList();
-            if( unitsPresent.Count==0)
+            if(isLearning)
             {
-                var newobject = GameObject.Instantiate(unitProto);
-                unitsPresent.Add(newobject.GetComponent<ObjectInfo>());
-                newobject.GetComponent<ObjectInfo>().player = this;
-            }
-            foreach (var o in unitsPresent)
-            {
+                FriendlyUnits.Clear();
+                var unitsPresent = FindObjectsOfType<ObjectInfo>().Where(x => x.player == this).ToList();
+                if (unitsPresent.Count == 0)
+                {
+                    var newobject = GameObject.Instantiate(unitProto);
+                    unitsPresent.Add(newobject.GetComponent<ObjectInfo>());
+                    newobject.GetComponent<ObjectInfo>().player = this;
+                }
+                foreach (var o in unitsPresent)
+                {
                     units.Add(o.gameObject);
                     AddFriendlyUnit(o.gameObject);
+                }
+                GetComponent<Selector>().ClearSelection();
+                GameEvent.current.ClearListeners();
             }
-            GetComponent<Selector>().ClearSelection();
-            GameEvent.current.ClearListeners();
+
         }
 
         public override void Heuristic(float[] actionsOut)
@@ -179,7 +185,12 @@ namespace RTSGame
             if (units.Count == 0)
             {
                 //FindObjectOfType<GameController>().CurrentGameState = GameState.LOST;
-                EndEpisode();
+                selector.ReleaseUI();
+
+                if (isLearning)
+                {
+                    EndEpisode();
+                }
             }
         }
 
