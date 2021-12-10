@@ -1,0 +1,83 @@
+{
+    "PlayerContinuous": {
+        "checkpoints": [
+            {
+                "steps": 49782,
+                "file_path": "results\\211125-2235\\PlayerContinuous\\PlayerContinuous-49782.nn",
+                "reward": 8.700000762939453,
+                "creation_time": 1637876759.2959661
+            },
+            {
+                "steps": 99935,
+                "file_path": "results\\211125-2235\\PlayerContinuous\\PlayerContinuous-99935.nn",
+                "reward": 16.383334159851074,
+                "creation_time": 1637876856.2349634
+            },
+            {
+                "steps": 149584,
+                "file_path": "results\\211125-2235\\PlayerContinuous\\PlayerContinuous-149584.nn",
+                "reward": null,
+                "creation_time": 1637876944.7600687
+            },
+            {
+                "steps": 199667,
+                "file_path": "results\\211125-2235\\PlayerContinuous\\PlayerContinuous-199667.nn",
+                "reward": 9.641667485237122,
+                "creation_time": 1637877040.6669297
+            },
+            {
+                "steps": 249980,
+                "file_path": "results\\211125-2235\\PlayerContinuous\\PlayerContinuous-249980.nn",
+                "reward": 19.195001745223998,
+                "creation_time": 1637877127.3926075
+            },
+            {
+                "steps": 299785,
+                "file_path": "results\\211125-2235\\PlayerContinuous\\PlayerContinuous-299785.nn",
+                "reward": null,
+                "creation_time": 1637877240.8886743
+            },
+            {
+                "steps": 349945,
+                "file_path": "results\\211125-2235\\PlayerContinuous\\PlayerContinuous-349945.nn",
+                "reward": -1.8799999475479126,
+                "creation_time": 1637877314.4404933
+            },
+            {
+                "steps": 399885,
+                "file_path": "results\\211125-2235\\PlayerContinuous\\PlayerContinuous-399885.nn",
+                "reward": -2.0199999690055845,
+                "creation_time": 1637877431.2316191
+            },
+            {
+                "steps": 449844,
+                "file_path": "results\\211125-2235\\PlayerContinuous\\PlayerContinuous-449844.nn",
+                "reward": -2.944444417953491,
+                "creation_time": 1637877508.7199678
+            },
+            {
+                "steps": 499696,
+                "file_path": "results\\211125-2235\\PlayerContinuous\\PlayerContinuous-499696.nn",
+                "reward": -2.9416666428248086,
+                "creation_time": 1637877632.6147776
+            },
+            {
+                "steps": 500696,
+                "file_path": "results\\211125-2235\\PlayerContinuous\\PlayerContinuous-500696.nn",
+                "reward": -2.9416666428248086,
+                "creation_time": 1637877634.8483286
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 500696,
+            "file_path": "results\\211125-2235\\PlayerContinuous.nn",
+            "reward": -2.9416666428248086,
+            "creation_time": 1637877634.8483286
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.1.0",
+        "mlagents_version": "0.20.0",
+        "tensorflow_version": "2.3.1"
+    }
+}

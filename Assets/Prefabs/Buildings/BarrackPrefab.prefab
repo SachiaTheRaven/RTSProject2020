@@ -529,6 +529,8 @@ GameObject:
   - component: {fileID: 2891843215808170046}
   - component: {fileID: 2891843215808170044}
   - component: {fileID: 2083242480}
+  - component: {fileID: 5136939777620923531}
+  - component: {fileID: 8287801019775661689}
   m_Layer: 0
   m_Name: BarrackPrefab
   m_TagString: Untagged
@@ -566,9 +568,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64330c9bb34c20447be0f4d5ef7cd641, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  price: 0
+  PlayerObject: {fileID: 0}
   player: {fileID: 0}
-  buildingName: Barrack
+  unitType: 3
+  price: 20
+  objectName: Barrack
   unitPrototype: {fileID: 3355122582915056412, guid: 41ea3118b687bc1499c680b8786f32d7,
     type: 3}
   rallyPoint: {fileID: 1612759481}
@@ -604,6 +608,35 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
+--- !u!114 &5136939777620923531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2891843215808170017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a96a9a93922cff64aa04738c0f074ab7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHP: 250
+  hp: 250
+  HealthBar: {fileID: 0}
+  UnitUIHealthbar: {fileID: 0}
+--- !u!114 &8287801019775661689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2891843215808170017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 619ad5ab88cb8b94193a2a5eb560c9fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxNumberOfTasks: 10
 --- !u!1001 &2891843214766409517
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -14,23 +14,19 @@ namespace RTSGame
             player = GetComponent<PlayerController>();
         }
 
-        // Update is called once per frame
-        void Update()
+       
+        public void PlaceBuilding(GameObject prototype, RaycastHit hit)
         {
-
-        }
-
-        public void PlaceBuilding(GameObject prototype, Vector3 position)
-        {
-            var objectInfo = prototype.GetComponent<GeneralBuilding>();
-            if (player.resourceManager.GetResourceAmount(ResourceTypes.GOLD) > objectInfo.price)
+            var objectInfo = prototype.GetComponent<ObjectInfo>();
+            if (player.Stats.PlayerResourceManager.GetResourceAmount(ResourceTypes.GOLD) > objectInfo.price)
             {
-                player.resourceManager.AddResource(ResourceTypes.GOLD, -objectInfo.price);
-                player.resourceManager.AddResource(ResourceTypes.BUILDINGS, 1);
+                player.Stats.PlayerResourceManager.AddResource(ResourceTypes.GOLD, -objectInfo.price);
+                player.Stats.PlayerResourceManager.AddResource(ResourceTypes.BUILDINGS, 1);
                 GameObject newGO = Instantiate(prototype);
-                newGO.transform.position = position;
-                newGO.GetComponent<GeneralBuilding>().player = player;
-                player.buildings.Add(newGO);
+                newGO.transform.position = hit.point;
+                newGO.transform.rotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
+                newGO.GetComponent<ObjectInfo>().Player = player;
+                player.Stats.Units.Add(newGO);
 
             }
             else Debug.Log("Not enough money");

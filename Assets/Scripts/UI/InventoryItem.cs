@@ -13,7 +13,7 @@ namespace RTSGame
         TextMeshProUGUI numberText;
         public Image resourceImage;
 
-        public Material stoneMaterial;
+        public  Material stoneMaterial;
         void Start()
         {
             numberText = GetComponentInChildren<TextMeshProUGUI>();

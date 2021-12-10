@@ -6,19 +6,22 @@ using UnityEngine;
 namespace RTSGame
 {
 
-    public class NodeManager : GeneralBuilding
+    public class NodeManager : ObjectInfo
     {
         public ResourceTypes resourceType;
         public float availableResource;
         public ParticleSystem explosionEffect;
-        void Start()
-        {
-        }
+       
         void Update()
         {
             if (availableResource <= 0)
             {
-                
+                if(Player!=null && Player is AIPlayer aiPlayer)
+                {
+                    Debug.Log("Ending episode due to no more mining thingy");
+                    aiPlayer.EndEpisode();
+
+                }
                 Destroy(gameObject);
             }
 

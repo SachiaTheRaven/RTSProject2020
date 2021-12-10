@@ -9,11 +9,12 @@ using UnityEngine.UIElements;
 
 namespace RTSGame
 {
+    [RequireComponent(typeof(MovementController))]
     public class GatheringController : MonoBehaviour
     {
         //references to other components of this go we use multiple times
         MovementController movementController;
-        ObjectInfo objectInfo;
+        UnitObjectInfo objectInfo;
         TaskManager taskManager;
 
         //references to components of other go's
@@ -31,19 +32,21 @@ namespace RTSGame
 
         void Start()
         {
-            resourceManager = FindObjectOfType<ResourceManager>();
-            if (resourceManager == null) throw new Exception("No ResourceManager found!");
-
-            //TODO maybe [requirecomponent]?
             movementController = GetComponent<MovementController>();
             if (movementController == null) throw new Exception("No MovementController found!");
-            objectInfo = GetComponent<ObjectInfo>();
+
+            objectInfo = GetComponent<UnitObjectInfo>();
             if (objectInfo == null) throw new Exception("No ObjectInfo found!");
+
+            resourceManager =objectInfo.Player.Stats.PlayerResourceManager;
+            if (resourceManager == null) throw new Exception("No ResourceManager found!");
+
+
             taskManager = GetComponent<TaskManager>();
             if (taskManager == null) throw new Exception("No TaskManager found!");
 
             //todo sounds like wasting resources
-            StartCoroutine("GatherTick");
+            StartCoroutine(GatherTick());
         }
 
         // Update is called once per frame
@@ -75,7 +78,7 @@ namespace RTSGame
                 heldResources[nodeManager.resourceType] = newBlock;
 
                 if(objectInfo.isSelected)
-                    FindObjectOfType<UnitUIManager>().InsertInventoryItem(this, nodeManager.resourceType,GetComponent<ObjectInfo>());
+                    FindObjectOfType<UnitUIManager>()?.InsertInventoryItem(this, nodeManager.resourceType,GetComponent<ObjectInfo>());
 
             }
 
@@ -125,7 +128,7 @@ namespace RTSGame
                         if (objectInfo.status == UnitStatus.DELIVERING)
                         {
                             UnloadResources();
-                            if(taskManager.taskInProgress!=null &&!taskManager.taskInProgress.IsFinished())
+                            if(taskManager.taskInProgress!=null &&!taskManager.taskInProgress.IsFinished() && gatheringFrom!=null)
                             {
                                 movementController.Move(gatheringFrom.transform.position);
                                 objectInfo.status = UnitStatus.GATHERING;
@@ -157,7 +160,7 @@ namespace RTSGame
             while (true)
             {
                 yield return new WaitForSeconds(1);
-                if (isGathering && !heldResources[nodeManager.resourceType].IsFull)
+                if (isGathering && !heldResources[nodeManager.resourceType].IsFull && gatheringFrom!=null)
                 {
                     gatheringFrom.GetComponent<NodeManager>().Gather(1);
                     heldResources[nodeManager.resourceType].AddResource(1);

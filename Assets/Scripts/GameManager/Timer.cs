@@ -7,13 +7,27 @@ namespace RTSGame
 {
     public class Timer : MonoBehaviour
     {
+        private static Timer current;
+        public static Timer Current
+        {
+            get
+            {
+                return current;
+            }
+        }
         public int currentSeconds = 0;
-        private int timeLimit = 60;
+        private int timeLimit = 120;
         public TextMeshProUGUI timerText;
         GameController gc;
+        private void Awake()
+        {
+            if (current == null) current = this;
+            else if (current != this) Destroy(this);
+        }
         void Start()
         {
-            gc = FindObjectOfType<GameController>();
+
+            gc = GameController.Current;
 
             StartCoroutine("Tick");
 
@@ -30,13 +44,21 @@ namespace RTSGame
                 {
                     DisplayTime();
                 }
-                if (currentSeconds >= timeLimit)
+               /* if (currentSeconds >= timeLimit)
                 {
                     //gc.CurrentGameState = GameState.WON;
-                    gc.players.ForEach(x=>x.AddReward(1.0f));
-                    gc.players.ForEach(x => x.EndEpisode());
+                    //TODO maybe külön kéne szedni a Timertől
+                    gc.players.ForEach(x=> {
+                        if (x is AIPlayer)
+                        {
+                            //(x as AIPlayer).AddReward(1.0f);
+                            (x as AIPlayer).EndEpisode();
+                        }
+                    });
+                    currentSeconds = 0;
+                    Debug.Log("Time down!");
 
-                }
+                }*/
             }
 
         }
@@ -45,5 +67,7 @@ namespace RTSGame
 
             timerText.text = currentSeconds / 60 + ":" + currentSeconds % 60;
         }
+
+    
     }
 }

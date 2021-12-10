@@ -11,19 +11,10 @@ namespace RTSGame
         // Start is called before the first frame update
         public GameObject taskQPanel;
         public GameObject taskPrefab;
+
         [SerializeField]
-        public List<DictionaryItem> TaskImages;
+        public List<ActionDictionaryItem> TaskImages;
 
-        void Start()
-        {
-
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
 
         public void DisplayActions(TaskManager taskmgr)
         {
@@ -38,7 +29,9 @@ namespace RTSGame
             newTaskItem.transform.SetParent(taskQPanel.transform, false);
             TaskItem taskItem = newTaskItem.GetComponent<TaskItem>();
             taskItem.AssignedAction = action;
-            taskItem.AssignImage(TaskImages.Where(x=>x.type==action.type).First().image);
+            var img = TaskImages.Where(x => x.key == action.type).FirstOrDefault();
+            if (img != null)
+                taskItem.AssignImage(img.value);
 
 
         }

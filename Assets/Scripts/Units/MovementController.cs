@@ -10,7 +10,7 @@ namespace RTSGame
 
         NavMeshAgent agent;
         public GameObject rallyPoint;
-        ObjectInfo oinfo;
+        protected UnitObjectInfo oinfo;
 
 
         void Start()
@@ -21,21 +21,23 @@ namespace RTSGame
                 agent.SetDestination(rallyPoint.transform.position);
             }
             agent.stoppingDistance = 0.7f;
-            oinfo = GetComponent<ObjectInfo>();
+            oinfo = GetComponent<UnitObjectInfo>();
         }
 
-        // Update is called once per frame
-        void Update()
+        public virtual void Move(Vector3 target)
         {
-        }
-
-        public void Move(Vector3 target)
-        {
-            GetComponent<ObjectInfo>().status=UnitStatus.MOVING;
+            oinfo.status=UnitStatus.MOVING;
             agent.SetDestination(target);
         }
 
-        public bool ReachedDestination(Vector3 pos)
+        //check if destination is reachable
+        public bool HasPathToDestination(Vector3? pos)
+        {
+            if (pos == null) return false;
+            NavMeshPath path = new NavMeshPath();
+            return agent.CalculatePath((Vector3)pos,path);
+        }
+        public virtual bool ReachedDestination(Vector3 pos)
         {
            // Debug.Log(agent.destination + "-" + pos + "-" + transform.position);
             return (agent.destination.x == pos.x && agent.destination.z == pos.z) &&

@@ -7,11 +7,23 @@ namespace RTSGame
 {
     public class GameEvent : MonoBehaviour
     {
-        public static GameEvent current;
-        private void Awake()
+        //private static GameEvent current;
+       /* public static GameEvent Current
         {
-            current = this;
-        }
+            get
+            {                
+                return current;
+            }
+
+        }*/
+
+      /*  private void Awake()
+        {
+            if (current == null)
+                current = this;
+            else if (current != this)
+                Destroy(this);
+        }*/
 
         public event System.Action<Vector3, ActionType> OnPositionActionSent;
         public event System.Action<GameObject, ActionType, int> OnObjectActionSent;
@@ -29,5 +41,7 @@ namespace RTSGame
             OnPositionActionSent = null;
             OnObjectActionSent = null;
         }
+
+        
     }
 }

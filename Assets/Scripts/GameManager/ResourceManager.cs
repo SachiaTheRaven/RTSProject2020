@@ -1,67 +1,92 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 namespace RTSGame
 {
+
     public class ResourceManager : MonoBehaviour
     {
+        [SerializeField]
+        public List<ResourceDictionaryItem> resources;
+        [SerializeField]
+        public List<ResourceDictionaryItem> startResources;
+        [SerializeField]
+        public List<ResourceDictionaryItem> maxResources;
 
-        Dictionary<ResourceTypes, int> resources;
-        Dictionary<ResourceTypes, int> maxResources;
+        public bool HasDisplay = true;
 
+        //TODO DrawIf propertydrawer or child class bcuz the OOP gods are gonna hate us
         public TextMeshProUGUI stoneDisplay;
         public TextMeshProUGUI ironDisplay;
         public TextMeshProUGUI foodDisplay;
         public TextMeshProUGUI goldDisplay;
         public TextMeshProUGUI populationDisplay;
+
         void Start()
         {
-            resources = new Dictionary<ResourceTypes, int>();
-            maxResources = new Dictionary<ResourceTypes, int>();
+            resources = new List<ResourceDictionaryItem>();
 
-            //TODO: körülményes, máshogy kéne
-            resources.Add(ResourceTypes.FOOD, 0);
-            resources.Add(ResourceTypes.IRON, 0);
-            resources.Add(ResourceTypes.STONE, 0);
-            resources.Add(ResourceTypes.POPULATION, 0);
-            resources.Add(ResourceTypes.GOLD, 150);
-            resources.Add(ResourceTypes.BUILDINGS, 3);
-            
-            maxResources.Add(ResourceTypes.FOOD, 100);
-            maxResources.Add(ResourceTypes.IRON, 100);
-            maxResources.Add(ResourceTypes.STONE, 100);
-            maxResources.Add(ResourceTypes.POPULATION, 100);
-            maxResources.Add(ResourceTypes.GOLD, 1000);
-            maxResources.Add(ResourceTypes.BUILDINGS, 10);
+            foreach (var p in startResources)
+            {
+                resources.Add(new ResourceDictionaryItem(p));
+            }
         }
 
         //TODO: auto-generate panels from prefabs
         void Update()
         {
-            
-            if(FindObjectOfType<GameController>().UIon)
+
+            if (HasDisplay && FindObjectOfType<GameController>().UIon)
             {
-                stoneDisplay.text = resources[ResourceTypes.STONE].ToString() + "/" + maxResources[ResourceTypes.STONE].ToString();
-                ironDisplay.text = resources[ResourceTypes.IRON].ToString() + "/" + maxResources[ResourceTypes.IRON].ToString();
-                foodDisplay.text = resources[ResourceTypes.FOOD].ToString() + "/" + maxResources[ResourceTypes.FOOD].ToString();
-                goldDisplay.text = resources[ResourceTypes.GOLD].ToString() + "/" + maxResources[ResourceTypes.GOLD].ToString();
-                populationDisplay.text = resources[ResourceTypes.POPULATION].ToString() + "/" + maxResources[ResourceTypes.POPULATION].ToString();
+                stoneDisplay.text = GetResourceAmount(ResourceTypes.STONE).ToString() + "/" + GetMaxResourceAmount(ResourceTypes.STONE).ToString();
+                ironDisplay.text = GetResourceAmount(ResourceTypes.IRON).ToString() + "/" + GetMaxResourceAmount(ResourceTypes.IRON).ToString();
+                foodDisplay.text = GetResourceAmount(ResourceTypes.FOOD).ToString() + "/" + GetMaxResourceAmount(ResourceTypes.FOOD).ToString(); //TODO consider if necessary
+                goldDisplay.text = GetResourceAmount(ResourceTypes.GOLD).ToString() + "/" + GetMaxResourceAmount(ResourceTypes.GOLD).ToString();
+                populationDisplay.text = GetResourceAmount(ResourceTypes.POPULATION).ToString() + "/" + GetMaxResourceAmount(ResourceTypes.POPULATION).ToString();
             }
-            
+
         }
 
         public int RemainingCapacity(ResourceTypes type)
         {
-            return maxResources[type] - resources[type];
+            return GetMaxResourceAmount(type) - GetResourceAmount(type);
         }
 
         public void AddResource(ResourceTypes type, int amount)
         {
-            if (resources[type] + amount <= maxResources[type]) resources[type] += amount;
-            else resources[type] = maxResources[type];
+            if (resources != null)
+            {
+                int newAmount = GetResourceAmount(type) + amount;
+                int maxAmount = GetMaxResourceAmount(type);
+                if (newAmount <= 0) SetResourceAmount(type, 0);
+                else if (newAmount <= maxAmount) SetResourceAmount(type, newAmount);
+                else SetResourceAmount(type, maxAmount);
+            }
         }
         public int GetResourceAmount(ResourceTypes type)
-        { return resources[type]; }
+        {
+            var res = resources.Where(x => x.key == type).FirstOrDefault();
+            return res == null ? 0 : res.value;
+        }
+        public void ResetResources()
+        {
+            /*foreach(var res in resources)
+            {
+                SetResourceAmount(res.key, GetMaxResourceAmount(res.key));
+            }*/
+            SetResourceAmount(ResourceTypes.GOLD, GetMaxResourceAmount(ResourceTypes.GOLD));
+        }
+        public void SetResourceAmount(ResourceTypes type, int amount)
+        {
+            var res = resources.Where(x => x.key == type).FirstOrDefault();
+            if (res != null) res.value = amount;
+        }
+        public int GetMaxResourceAmount(ResourceTypes type)
+        {
+            var res = maxResources.Where(x => x.key == type).FirstOrDefault();
+            return res == null ? 0 : res.value;
+        }
     }
 }

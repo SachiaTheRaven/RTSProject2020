@@ -6,10 +6,18 @@ namespace RTSGame
 {
     public class GameController : MonoBehaviour
     {
+        private static GameController current;
+        public static GameController Current
+        {
+            get
+            {
+                return current;
+            }
+        }
         public bool UIon;
 
         private GameState gameState = GameState.RUNNING;
-        public List<PlayerController> players = new List<PlayerController>();
+        public List<ICommonPlayer> players; //don't believe it when it says new() can be simplified. Unity can't handle it.
         public GameObject trainingFieldPrefab;
        // public PlayerController mainPlayer;
         public GameState CurrentGameState
@@ -24,11 +32,30 @@ namespace RTSGame
                 }
             }
         }
-
+        private void Awake()
+        {
+            
+       /*   Time.timeScale = 0;
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                     Instantiate(trainingFieldPrefab, new Vector3(i * 35, 0, j * 35),Quaternion.identity);
+                   // tpf.transform.localPosition = new Vector3(i * 15, 0, j * 15);
+                }
+            }*/
+            if (current == null) current = this;
+            else if (current != this) Destroy(this);
+        }
         private void Start()
         {
 
-            players = new List<PlayerController>(FindObjectsOfType<PlayerController>());
+            players = new List<ICommonPlayer>();
+
+            players.AddRange(FindObjectsOfType<PlayerController>());
+            players.AddRange(FindObjectsOfType<AIPlayer>());
+            players.AddRange(FindObjectsOfType<EnemyPlayerController>());
+
             DontDestroyOnLoad(this.gameObject);
         }
         void EndGame(GameState gameState) //TODO: reconsider whether gamestate check is needed

@@ -6,9 +6,9 @@ namespace RTSGame
 {
     public enum UnitStatus
     {
-        GATHERING,
+       IDLE,
         MOVING,
-        IDLE,
+        GATHERING,
         BUILDING,
         ATTACKING,
         DELIVERING
@@ -19,8 +19,10 @@ namespace RTSGame
         {
         MOVE,
         HARVEST,
-        ATTACK
+        ATTACK,
+        BUILD
     }
+    [Serializable]
     public enum ResourceTypes
     {
         STONE,
@@ -38,5 +40,13 @@ namespace RTSGame
         WON,
         LOST
     }   
+    
+    public enum UnitType
+    {
+        BIG_BAD_BUG,
+        SMOL_BUG,
+        BASIC_ORC,
+        BUILDING
+    }
 }
 

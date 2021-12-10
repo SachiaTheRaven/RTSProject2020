@@ -1,23 +1,24 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 namespace RTSGame
 {
     public class TaskManager : MonoBehaviour
     {
         // Start is called before the first frame update
-        public List<Action> taskList;
+        public List<Action> taskList = new List<Action>();
         public Action taskInProgress;
         public int maxNumberOfTasks = 10;
 
-       ObjectInfo objectInfo;
+        ObjectInfo objectInfo;
         DamageDealer dmg;
 
 
 
         void Start()
         {
-            taskList = new List<Action>();
+            //taskList = new List<Action>();
             objectInfo = GetComponent<ObjectInfo>();
             dmg = GetComponent<DamageDealer>();
 
@@ -44,74 +45,60 @@ namespace RTSGame
         }
         private void AddTask(Action action)
         {
-            //check if in combat
-            if(dmg!=null&& !dmg.inCombat)
-            {
-                //if it's an attack, switch to combat mode
-                if (action.type == ActionType.ATTACK)
-                {
-                    dmg.inCombat = true;
-                    foreach( var task in taskList)
-                    {
-                        RemoveAction(task);
-                    }
-                    taskList.Add(action);
-                    
-                }
-                else //if not, commence normally
-                {
-                    if (taskList.Count < maxNumberOfTasks)
-                    {
-                        taskList.Add(action);
-                    }
-                    else
-                    {
-                        //TODO valami effektet megjeleníteni
-                    }
-                }
-            }
-            else  //if in combat deny non-combat action types
-            {
-                if(action.type==ActionType.ATTACK)
-                {
-                    taskList.Add(action);
-                }
-                else
-                {
-                    Debug.Log("Can't do that while in combat");
-                }
 
+            if (taskList.Count < maxNumberOfTasks)
+            {
+                taskList.Add(action);
             }
-
+            else
+            {
+                //TODO valami effektet megjeleníteni
+            }
         }
 
         //TODO ez valószínűleg felesleges duplicate
 
         public void CreateTask(Vector3 pos, ActionType type)
         {
+
             Action action = new ActionOnPosition(gameObject, pos, type);
             AddTask(action);
 
             if (FindObjectOfType<GameController>().UIon)
                 FindObjectOfType<TaskQueuePanelControl>().AddActionItemToDisplay(action);
 
+
         }
         public void CreateTask(GameObject target, ActionType type, int roundLimit)
         {
             Action action = new ActionOnObject(gameObject, target, type, roundLimit);
             AddTask(action);
-            FindObjectOfType<TaskQueuePanelControl>().AddActionItemToDisplay(action);
+            //TODO ezért jelenik meg 25 példányban a task!! átírni csak a sajátjára
+            FindObjectOfType<TaskQueuePanelControl>()?.AddActionItemToDisplay(action);
         }
         public void CancelAction()
         {
+            if (taskInProgress!=null && taskInProgress.type == ActionType.ATTACK)
+            {
+                taskInProgress.initiator.GetComponent<DamageDealer>().ClearTarget();
+            }
             taskInProgress = null;
             objectInfo.status = UnitStatus.IDLE;
+        }
+
+        public void CancelAllActions()
+        {
+            foreach (var task in taskList.ToList())
+            {
+                RemoveAction(task);
+            }
         }
 
         public void RemoveAction(Action toBeRemoved)
         {
             if (toBeRemoved == taskInProgress)
             {
+
                 CancelAction();
             }
             else
@@ -122,8 +109,16 @@ namespace RTSGame
 
         private void OnDestroy()
         {
-            GameEvent.current.OnObjectActionSent -= CreateTask;
-            GameEvent.current.OnPositionActionSent -= GetComponent<TaskManager>().CreateTask;
+            if (objectInfo != null && objectInfo.Player != null)
+            {
+                objectInfo.Player.Stats.GameEventManager.OnObjectActionSent -= CreateTask;
+                objectInfo.Player.Stats.GameEventManager.OnPositionActionSent -= GetComponent<TaskManager>().CreateTask;
+            }
+        }
+
+        public bool IsTaskQueueFull()
+        {
+            return maxNumberOfTasks == taskList.Count();
         }
     }
 }

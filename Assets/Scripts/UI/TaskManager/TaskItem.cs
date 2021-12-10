@@ -12,7 +12,7 @@ namespace RTSGame
         
         
         public Button button;
-        void Start()
+        public virtual void Start()
         {
             button = GetComponentInChildren<Button>();
             button.onClick.AddListener(OnClick);
@@ -32,7 +32,7 @@ namespace RTSGame
                 Destroy(this.gameObject);
             }
         }
-        public void OnClick()
+        public virtual void OnClick()
         {
             if (AssignedAction != null)
                 AssignedAction.Cancel();

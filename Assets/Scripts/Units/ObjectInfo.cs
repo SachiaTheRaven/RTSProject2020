@@ -1,74 +1,57 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.AI;
+﻿using UnityEngine;
 
 namespace RTSGame
 {
     public class ObjectInfo : MonoBehaviour
     {
+        public GameObject PlayerObject;
+      //  [SerializeField, SerializeReference]
+        // [RequireInterface(typeof(ICommonPlayer))] //TODO fix this
+        public ICommonPlayer Player;
+        public UnitType unitType;
         public UnitStatus status;
-        public PlayerController player;
+        /*public ICommonPlayer Player
+        {
+            get
+            {
+                return player as ICommonPlayer;
+            }
+            set
+            {
+                player = (Object)value;
+            }
+        }*/
         public int price = 1;
-
-        internal bool isSelected { get; set; }
         public string objectName;
 
-        RallyPoint rallyPoint;
+        protected virtual void Awake()        {
 
-        public GameObject selectionMarker;
-
-
-        void Start()
-        {
-            status = UnitStatus.IDLE;
-
-            if(player!=null)
+            if (Player == null && PlayerObject != null) Player = PlayerObject.GetComponent<ICommonPlayer>();
+            if (Player != null)
             {
-                player.units.Add(gameObject);
-                player.AddFriendlyUnit(this.gameObject);
+                Player.Stats.AddFriendlyUnit(this.gameObject);
             }
+            //Debug.Log(Player);
 
         }
 
-        public void ToggleSelection(bool direction)
+        protected void OnTriggerEnter(Collider other)
         {
-            isSelected = direction;
-            selectionMarker.SetActive(direction);
-            if (direction)
+            var oinfo = other.GetComponent<ObjectInfo>();
+            if (Player!=null && oinfo != null && oinfo.Player != null && !oinfo.Player.Equals(Player))
             {
-                GameEvent.current.OnObjectActionSent += GetComponent<TaskManager>().CreateTask;
-                GameEvent.current.OnPositionActionSent += GetComponent<TaskManager>().CreateTask;
-            }
-            else
-            {
-                GameEvent.current.OnObjectActionSent -= GetComponent<TaskManager>().CreateTask;
-                GameEvent.current.OnPositionActionSent -= GetComponent<TaskManager>().CreateTask;
-            }
-        }
-        
-        public void SetRallyPoint(RallyPoint pos)
-        {
-            rallyPoint = pos;
-        }
-        private void OnTriggerEnter(Collider other)
-        {
-            if(other.CompareTag("Enemy"))
-            {
-                player.AddEnemyInRange(other.gameObject);
+                Player.Stats.AddEnemyInRange(other.gameObject);
             }
         }
 
-        private void OnTriggerExit(Collider other)
+        protected void OnTriggerExit(Collider other)
         {
-            if(other.CompareTag("Enemy"))
+            var oinfo = other.GetComponent<ObjectInfo>();
+            if (Player!=null && oinfo != null && oinfo.Player != null && !oinfo.Player.Equals(Player))
             {
-                player.RemoveEnemyFromRange(other.gameObject);
+                Player.Stats.RemoveEnemyFromRange(other.gameObject);
             }
         }
+
     }
-
-    
 }

@@ -67,16 +67,25 @@ namespace RTSGame
             type = at;
             maxRounds = roundLimit;
             roundsFinished = 0;
-            switch(at)
+            switch (at)
             {
                 case ActionType.HARVEST:
                     {
                         IsFinished = new IsFinishedDelegate(() => { return HasRoundLimit && roundLimit <= roundsFinished; });
-                    } break;
+                    }
+                    break;
                 case ActionType.ATTACK:
                     {
-                        IsFinished = new IsFinishedDelegate(() => { return (HasRoundLimit && roundLimit <= roundsFinished )|| targetObject==null; });
+                        IsFinished = new IsFinishedDelegate(() => { return (HasRoundLimit && roundLimit <= roundsFinished) || targetObject == null; });
 
+                    }
+                    break;
+                case ActionType.BUILD:
+                    {
+                        IsFinished = new IsFinishedDelegate(() =>
+                        {
+                            return initiator.GetComponent<Trainer>().isDone;
+                        });
                     }
                     break;
             }
@@ -87,28 +96,45 @@ namespace RTSGame
 
         public override void Execute()
         {
-            MovementController mc = initiator.GetComponent<MovementController>();
-            ObjectInfo oi = initiator.GetComponent<ObjectInfo>();
-            switch (type)
+            if (targetObject != null)
             {
-                case ActionType.HARVEST:
-                    {
-                        mc.Move(targetObject.transform.position);
-                        oi.status = UnitStatus.GATHERING;
+                MovementController mc = initiator.GetComponent<MovementController>();
+                ObjectInfo oi = initiator.GetComponent<ObjectInfo>();
 
-                    }
-                    break;
-                case ActionType.ATTACK:
-                    {
-                        mc.Move(targetObject.transform.position);
-                        oi.status = UnitStatus.ATTACKING;
-                        oi.GetComponent<DamageDealer>().SetTarget(targetObject.GetComponent<Destroyable>());
-                    }
-                    break;
-                default: Debug.LogError("No such type of action"); break;
+                switch (type)
+                {
+                    case ActionType.HARVEST:
+                        {
+                            mc.Move(targetObject.transform.position);
+                            oi.status = UnitStatus.GATHERING;
 
+                        }
+                        break;
+                    case ActionType.ATTACK:
+                        {
+
+                            mc.Move(targetObject.transform.position);
+                            oi.GetComponent<DamageDealer>().SetTarget(targetObject.GetComponent<Destroyable>());
+                        }
+                        break;
+                    case ActionType.BUILD:
+                        {
+
+                            var trainer = initiator.GetComponent<Trainer>();
+                            if (trainer != null)
+                            {
+                                oi.status = UnitStatus.BUILDING;
+                                trainer.TrainNew(targetObject);
+                            }
+                        }
+                        break;
+                    default: Debug.LogError("No such type of action"); break;
+
+                }
             }
+
         }
     }
+
 
 }
